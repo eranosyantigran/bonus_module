@@ -1,11 +1,18 @@
-# ---> Bitrix
-# gitignore template for 1C-Bitrix, a PHP-based CMS
-# website: https://www.1c-bitrix.ru
+### Bitrix template
 
-#Exclude all of core files
+# Исключаем настройки PHPStorm, мы в нём работаем
+/.idea/
+
+# Исключаем настройки VSCode, мы в нём работаем
+/.vscode/
+/
+!/local
+# Исключаем из гита битриксовые файлы
 /bitrix/*
+/bitrix/templates/landing24/
+urlrewrite.php
 
-#But not the templates and non bitrix components
+# Но не папку с шаблоном и не небитриксовые компоненты
 !/bitrix/templates
 !/bitrix/components
 /bitrix/components/bitrix
@@ -14,12 +21,81 @@
 !/bitrix/gadgets
 /bitrix/gadgets/bitrix
 
-#User can use that directory to store some stuff, but it's not really recommended, just use /local instead of this
+
 !/bitrix/php_interface/
 
-#Exclude database configs
+# Исключаем конфиги базы
 /bitrix/php_interface/dbconn.php
 
-#Exclude default file storage directory
-/upload/
+# Исключаем дефолтную директорию медиафайлов
+/upload/*
 
+# Исключаем индивидуально для проекта
+/local/php_interface/vendor/
+
+# различные системные папки и файлы хостингов и операционных систем
+/cgi-bin/
+/awstats/
+/webstat/
+.DS_Store
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# архивы, включая многотомные
+*.zip
+*.zip*
+*.tar
+*.tar*
+*.enc
+*.enc*
+*.gz
+*.gz*
+*.tgz
+*.tgz*
+*.sql
+*.rar
+.hg
+.ftpconfig
+*.doc
+*.gif
+*.docx
+*.pdf
+*.rtf
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.psd
+*.psb
+*.sketch
+
+# files ext
+*.tar.gz
+*.mp3
+*.mp4
+*.webm
+*.mov
+*.MOV
+*.wav
+*.flv
+*.db
+*.txt
+*.text
+*.log
+*.config
+*.xml
+*.tbk
+
+# исключаем всякое от node.js
+node_modules
+bower_components
+.grunt
+.npm
+.env
+
+# composer
+composer.phar
+/vendor/*
+/files/*
