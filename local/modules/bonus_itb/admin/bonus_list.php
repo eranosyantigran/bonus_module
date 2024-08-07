@@ -33,6 +33,11 @@ $lAdmin->AddHeaders(array(
         "sort"     =>"id",
         "default"  =>true,
     ),
+    array(  "id"    =>"type",
+        "content"  =>GetMessage("ITB_BONUS_OPERATION_TYPE"),
+        "sort"     =>"type",
+        "default"  =>true,
+    ),
     array(  "id"    =>"name",
         "content"  => GetMessage("ITB_BONUS_OPERATION_NAME"),
         "sort"     =>"name",
@@ -62,10 +67,9 @@ while ($aritem = $rsData->Fetch()){
 
     $rows->AddViewField("id", '<a href="./'.$editlink.'?lang='.SITE_ID.'&id='.$aritem['ID'].'">'.$aritem['ID'].'</a>');
 
+    $rows->AddViewField("type", $aritem['TYPE']);
     $rows->AddViewField("name", $aritem['NAME']);
-
     $rows->AddViewField("sum_money", $aritem['ADD_BONUS']);
-
     $rows->AddViewField("status", $aritem['ACTIVE']);
 
     $rsUser = \CUser::GetByID($aritem["USER"]);
@@ -90,6 +94,27 @@ $lAdmin->AddFooter(
         array("counter"=>true, "title"=>GetMessage("MAIN_ADMIN_LIST_CHECKED"), "value"=>"0"),
     )
 );
+$BonusTypes = array(
+    "order" => GetMessage("ITB_BONUS_PROFILE_ORDER"),
+);
+
+foreach($BonusTypes as $keyBonusType => $NameBonusType):
+    $BonusTypesMenu[] = array(
+        "TEXT" => $NameBonusType,
+        "ACTION" => $lAdmin->ActionRedirect("./".$editlink."?id=new&type=".$keyBonusType)
+    );
+endforeach;
+
+$aContext = array(
+    array(
+        "TEXT" => GetMessage("ITB_BONUS_PROFILES_ADD_ACTION"),
+        "LINK" => $editlink."?lang=".LANGUAGE_ID."&id=new",
+        "TITLE" => GetMessage("ITB_BONUS_PROFILES_ADD_ACTION"),
+        "ICON" => "btn_new",
+        "MENU" => $BonusTypesMenu
+    )
+);
+$lAdmin->AddAdminContextMenu($aContext);
 
 $lAdmin->CheckListMode();
 

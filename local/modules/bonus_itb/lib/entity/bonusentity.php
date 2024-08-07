@@ -34,6 +34,9 @@ Class BonusEventTable extends Entity\DataManager
             new Entity\StringField('TYPE', array(
                 'column_name' => 'type',
             )),
+            new Entity\TextField('CONDITIONS', array(
+                'column_name' => 'conditions',
+            )),
             new Entity\IntegerField('USER', array(
                 'column_name' => 'user',
             )),
