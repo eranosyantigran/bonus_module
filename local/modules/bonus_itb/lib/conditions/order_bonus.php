@@ -61,7 +61,7 @@ class OrderBonus
         $params[] = array(
             "controlId" => 'conditionGroup',
             'group'=> true,
-            'label'=> GetMessage("ITB_ADD_PAY_COND"),
+            'label'=> GetMessage("ITB_SELECT_COND_ADD_BONUS"),
             'showIn'=> array('CondGroup'),
             'visual'=> array(
                 'controls' => array('All', 'True'),
@@ -70,24 +70,40 @@ class OrderBonus
                         'All' => 'AND',
                         'True' => 'True',
                     ),
+                    /*array(
+                            'All' => 'AND',
+                            'True' => 'False',
+                        ),*/
                     array(
                         'All' => 'OR',
                         'True' => 'True',
                     ),
+                    /*array(
+                            'All' => 'OR',
+                            'True' => 'False',
+                        )*/
                 ),
                 'logic' => array(
                     array(
                         'style' => 'condition-logic-and',
                         'message' => GetMessage("ITB_COND_AND")
                     ),
+                    /*array(
+                            'style' => 'condition-logic-and',
+                            'message' => 'AND NOT'
+                        ),*/
                     array(
                         'style' => 'condition-logic-or',
                         'message' => GetMessage("ITB_COND_OR")
                     ),
+                    /*array(
+                            'style' => 'condition-logic-or',
+                            'message' => 'OR NOT'
+                        )*/
                 )
             ),
             'control'=> array(
-                GetMessage("ITB_CAN_PAY"),
+                GetMessage("ITB_SELECT_COND_ADD_BONUS_TEXT"),
                 array
                 (
                     'id' => 'bonus',
@@ -125,7 +141,17 @@ class OrderBonus
                     'defaultValue' => 'C',
                     'defaultText' => '2',
                 ),
-                GetMessage("ITB_ROUND_SYMBOLS_PAYMENT"),
+                GetMessage("ITB_ROUND_SYMBOLS"),
+                array
+                (
+                    'id' => 'round_method',
+                    'name' => 'round_method',
+                    'type' => 'select',
+                    'values' => array('MATH'=>GetMessage("ITB_ROUND_MATH"), 'UP'=>GetMessage("ITB_ROUND_UP"), 'DOWN'=>GetMessage("ITB_ROUND_DOWN")),
+                    'defaultValue' => 'MATH',
+                    'defaultText' => GetMessage("ITB_ROUND_MATH"),
+                ),
+                GetMessage("ITB_FOR_PRODUCT"),
                 array
                 (
                     'id' => 'All',
@@ -153,9 +179,167 @@ class OrderBonus
 
         );
 
-        $arCatalogs = ItbHelpers::getCatalogs();
-        $arSites = ItbHelpers::GetListSties();
 
+        $params[] = array(
+            "controlId" => 'conditionGroup2',
+            'group'=> true,
+            'label'=> GetMessage("ITB_SELECT_COND_ADD_BONUS_GROUP_FROM_PROPS"),
+            'showIn'=> array('CondGroup'),
+            'visual'=> array(
+                'controls' => array('All', 'True'),
+                'values' => array(
+                    array(
+                        'All' => 'AND',
+                        'True' => 'True',
+                    ),
+                    /*array(
+                            'All' => 'AND',
+                            'True' => 'False',
+                        ),*/
+                    array(
+                        'All' => 'OR',
+                        'True' => 'True',
+                    ),
+                    /*array(
+                            'All' => 'OR',
+                            'True' => 'False',
+                        )*/
+                ),
+                'logic' => array(
+                    array(
+                        'style' => 'condition-logic-and',
+                        'message' => GetMessage("ITB_COND_AND")
+                    ),
+                    /*array(
+                            'style' => 'condition-logic-and',
+                            'message' => '? ??'
+                        ),*/
+                    array(
+                        'style' => 'condition-logic-or',
+                        'message' => GetMessage("ITB_COND_OR")
+                    ),
+                    /*array(
+                            'style' => 'condition-logic-or',
+                            'message' => '??? ??'
+                        )*/
+                )
+            ),
+            'control'=> array(
+                GetMessage("ITB_COND_ADD_BONUS_FROM_PROP"),
+                array
+                (
+                    'id' => 'bonus_from_props',
+                    'name' => 'bonus_from_props',
+                    'type' => 'input',
+                    'show_value' => 'Y',
+                    'defaultValue' => 'LOGICTIM_BONUS_BALLS'
+                ),
+                GetMessage("ITB_COND_ADD_BONUS_FROM_PROP_TYPE"),
+                array
+                (
+                    'id' => 'bonus_type',
+                    'name' => 'bonus_type',
+                    'type' => 'select',
+                    'values' => array('percent'=>GetMessage("ITB_SELECT_ADD_BONUS_PERCENT"), 'bonus'=>GetMessage("ITB_SELECT_ADD_BONUS_BONUS")),
+                    'defaultText' => GetMessage("ITB_SELECT_ADD_BONUS_PERCENT"),
+                    'defaultValue' => 'percent'
+                ),
+                GetMessage("ITB_ROUND_LABEL_SHORT"),
+                array
+                (
+                    'id' => 'round',
+                    'name' => 'round',
+                    'type' => 'select',
+                    'values' => array('A'=>'0', 'B'=>'1', 'C'=>'2', 'D'=>'3', 'E'=>'4'),
+                    'defaultValue' => 'C',
+                    'defaultText' => '2',
+                ),
+                GetMessage("ITB_ROUND_SYMBOLS"),
+                array
+                (
+                    'id' => 'All',
+                    'name' => 'All',
+                    'type' => 'select',
+                    'values' => array('AND'=>GetMessage("ITB_AND_CONDS"), 'OR'=>GetMessage("ITB_OR_CONDS")),
+                    'defaultText' => GetMessage("ITB_OR_CONDS"),
+                    'defaultValue' => 'OR'
+                ),
+                array
+                (
+                    'id' => 'True',
+                    'name' => 'True',
+                    'type' => 'select',
+                    'values' => array('True'=>GetMessage("ITB_CONDS_TRUE")/*, 'False'=>GetMessage("ITB_CONDS_FALSE")*/),
+                    'defaultText' => GetMessage("ITB_CONDS_TRUE"),
+                    'defaultValue' => 'True'
+                ),
+            ),
+            'mess' => array
+            (
+                'ADD_CONTROL' => GetMessage("ITB_ADD_COND"),
+                'SELECT_CONTROL' => GetMessage("ITB_SELECT_COND")
+            )
+
+        );
+
+        $params[] = array(
+            "controlId" => 'conditionGroup3',
+            'group'=> true,
+            'label'=> GetMessage("ITB_SELECT_COND_ADD_BONUS_ORDER"),
+            'showIn'=> array('CondGroup'),
+            'visual'=> array(
+                'controls' => array('All', 'True'),
+                'values' => array(
+                    array(
+                        'All' => 'AND',
+                        'True' => 'True',
+                    ),
+                    array(
+                        'All' => 'OR',
+                        'True' => 'True',
+                    ),
+                ),
+                'logic' => array(
+                    array(
+                        'style' => 'condition-logic-and',
+                        'message' => GetMessage("ITB_COND_AND")
+                    ),
+                    array(
+                        'style' => 'condition-logic-or',
+                        'message' => GetMessage("ITB_COND_OR")
+                    ),
+                )
+            ),
+            'control'=> array(
+                GetMessage("ITB_SELECT_COND_ADD_BONUS_ORDER_TEXT"),
+                array
+                (
+                    'id' => 'bonus',
+                    'name' => 'bonus',
+                    'type' => 'input',
+                    'show_value' => 'Y',
+                    'defaultValue' => '100'
+                ),
+                array
+                (
+                    'id' => 'bonus_type',
+                    'name' => 'bonus_type',
+                    'type' => 'select',
+                    'values' => array(/*'percent'=>GetMessage("ITB_SELECT_ADD_BONUS_PERCENT"), */'bonus'=>GetMessage("ITB_SELECT_ADD_BONUS_BONUS")),
+                    'defaultText' => GetMessage("ITB_SELECT_ADD_BONUS_PERCENT"),
+                    'defaultValue' => 'bonus'
+                ),
+            ),
+            'mess' => array
+            (
+                'ADD_CONTROL' => GetMessage("ITB_ADD_COND"),
+                'SELECT_CONTROL' => GetMessage("ITB_SELECT_COND")
+            )
+
+        );
+
+        $arCatalogs = \Itb\Bonus\ItbHelpers::getCatalogs();
+        $arSites = \Itb\Bonus\ItbHelpers::GetListSties();
         $params[] = array(
             'controlgroup'=> '1',
             'group'=> false,
@@ -295,19 +479,6 @@ class OrderBonus
                     'label'=> GetMessage("ITB_COND_DISCOUNT"),
                     'showIn'=> array('conditionGroup', 'conditionGroup2'),
                     'control'=> array(
-                        /*array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_DISCOUNT")),
-                        array(
-                            'id' => 'logic',
-                            'name' => 'logic',
-                            'type' => 'select',
-                            'values' => array
-                                            (
-                                                'Equal' => GetMessage("ITB_COND_EQUAL"),
-                                                'Not' => GetMessage("ITB_COND_NOT"),
-                                            ),
-                            'defaultText' => GetMessage("ITB_COND_EQUAL"),
-                            'defaultValue' => 'Equal'
-                        ),*/
                         array(
                             'type'=> 'select',
                             'id'=> 'value',
@@ -368,7 +539,6 @@ class OrderBonus
 
             )
         );
-
 
         //CART PARAMS
         $params[] = array(
@@ -431,17 +601,16 @@ class OrderBonus
         );
 
         $condotionsProps = \CCatalogCondCtrlIBlockProps::GetControlShow(array('SHOW_IN_GROUPS'=>array('conditionGroup', 'conditionGroup2')));
-
         if(count($condotionsProps) > 0)
         {
             foreach($condotionsProps as $oneProp):
                 $params[] = $oneProp;
             endforeach;
+
         }
 
-
         $params[]=array(
-            'controlId'=> 'conditionGroup',
+            'controlId'=> 'CondGroup',
             'group'=> true,
             'label'=> '',
             'defaultText'=> '',
@@ -449,26 +618,668 @@ class OrderBonus
             'control'=> array('CONDITION_PERFORM_OPERATIONS')
         );
 
-
-//        $str = \Bitrix\Main\Web\Json::encode($arrparams);
-//        print_r($str);
-
-//        echo "<pre>";
-//        print_r(\Bitrix\Main\Web\Json::decode($str));
-//
-//        die("sss");
-
-//        $str = '[{"controlId":"conditionGroup","group":true,"label":"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043f\u0440\u0430\u0432\u0438\u043b\u043e \u043e\u043f\u043b\u0430\u0442\u044b \u0431\u043e\u043d\u0443\u0441\u0430\u043c\u0438","showIn":["CondGroup"],"visual":{"controls":["All","True"],"values":[{"All":"AND","True":"True"},{"All":"OR","True":"True"}],"logic":[{"style":"condition-logic-and","message":"\u0418"},{"style":"condition-logic-or","message":"\u0418\u041b\u0418"}]},"control":["\u0420\u0430\u0437\u0440\u0435\u0448\u0438\u0442\u044c \u043e\u043f\u043b\u0430\u0447\u0438\u0432\u0430\u0442\u044c ",{"id":"bonus","name":"bonus","type":"input","show_value":"Y","defaultValue":"10"},{"id":"bonus_type","name":"bonus_type","type":"select","values":{"percent":"\u043f\u0440\u043e\u0446\u0435\u043d\u0442\u043e\u0432","bonus":"\u0431\u043e\u043d\u0443\u0441\u043e\u0432"},"defaultText":"\u043f\u0440\u043e\u0446\u0435\u043d\u0442\u043e\u0432","defaultValue":"percent"},"\u0441\u0442\u043e\u0438\u043c\u043e\u0441\u0442\u0438 \u0442\u043e\u0432\u0430\u0440\u0430 \u0441 \u043e\u043a\u0440\u0443\u0433\u043b\u0435\u043d\u0438\u0435\u043c \u0431\u043e\u043d\u0443\u0441\u043e\u0432 \u0437\u0430",{"id":"round_type","name":"round_type","type":"select","values":{"UNIT":"\u0435\u0434\u0438\u043d\u0438\u0446\u0443 \u0442\u043e\u0432\u0430\u0440\u0430","POSITION":"\u0432\u0441\u044e \u043f\u043e\u0437\u0438\u0446\u0438\u044e \u0442\u043e\u0432\u0430\u0440\u0430"},"defaultValue":"UNIT","defaultText":"\u0435\u0434\u0438\u043d\u0438\u0446\u0443 \u0442\u043e\u0432\u0430\u0440\u0430"},"\u0434\u043e",{"id":"round","name":"round","type":"select","values":{"A":"0","B":"1","C":"2","D":"3","E":"4"},"defaultValue":"C","defaultText":"2"},"\u0437\u043d\u0430\u043a\u043e\u0432 \u043f\u043e\u0441\u043b\u0435 \u0437\u0430\u043f\u044f\u0442\u043e\u0439, \u0434\u043b\u044f \u043a\u043e\u0442\u043e\u0440\u044b\u0445",{"id":"All","name":"All","type":"select","values":{"AND":"\u0432\u0441\u0435 \u0443\u0441\u043b\u043e\u0432\u0438\u044f","OR":"\u043b\u044e\u0431\u043e\u0435 \u0438\u0437 \u0443\u0441\u043b\u043e\u0432\u0438\u0439"},"defaultText":"\u043b\u044e\u0431\u043e\u0435 \u0438\u0437 \u0443\u0441\u043b\u043e\u0432\u0438\u0439","defaultValue":"OR"},{"id":"True","name":"True","type":"select","values":{"True":"\u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d\u043e(\u044b)"},"defaultText":"\u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d\u043e(\u044b)","defaultValue":"True"}],"mess":{"ADD_CONTROL":"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0443\u0441\u043b\u043e\u0432\u0438\u0435","SELECT_CONTROL":"\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0443\u0441\u043b\u043e\u0432\u0438\u0435"}},{"controlgroup":"1","group":false,"label":"\u041e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u043f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u044b","showIn":["conditionGroup","conditionGroup2"],"children":[{"controlId":"iblock","group":false,"label":"\u0418\u043d\u0444\u043e\u0431\u043b\u043e\u043a","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0418\u043d\u0444\u043e\u0431\u043b\u043e\u043a"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"select","multiple":"Y","values":{"2":"\u041e\u0434\u0435\u0436\u0434\u0430","3":"\u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f)"},"id":"value","name":"value","show_value":"Y","first_option":"...","defaultText":"...","defaultValue":""}]},{"controlId":"product_categoty","group":false,"label":"\u0420\u0430\u0437\u0434\u0435\u043b","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0420\u0430\u0437\u0434\u0435\u043b"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"popup","popup_url":"iblock_section_search.php","popup_params":{"lang":"ru","discount":"Y","simplename":"Y"},"param_id":"n","multiple":"Y","show_value":"Y","id":"value","name":"value"}]},{"controlId":"product","description":"","group":false,"label":"\u0422\u043e\u0432\u0430\u0440","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0422\u043e\u0432\u0430\u0440"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"multiDialog","popup_url":"cat_product_search_dialog.php","popup_params":{"lang":"ru","caller":"discount_rules","allow_select_parent":"Y"},"param_id":"n","show_value":"Y","id":"value","name":"value"}]},{"controlId":"price","group":false,"label":"\u0426\u0435\u043d\u0430","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0426\u0435\u043d\u0430"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Great":"\u0431\u043e\u043b\u044c\u0448\u0435","Less":"\u043c\u0435\u043d\u044c\u0448\u0435","EqGr":"\u0431\u043e\u043b\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e","EqLs":"\u043c\u0435\u043d\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0431\u043e\u043b\u044c\u0448\u0435","defaultValue":"Great"},{"type":"input","id":"value","name":"value","show_value":"Y","defaultValue":"0","logictimType":"float"}]},{"controlId":"discount","group":false,"label":"\u041d\u0430\u043b\u0438\u0447\u0438\u0435 \u0441\u043a\u0438\u0434\u043a\u0438","showIn":["conditionGroup","conditionGroup2"],"control":[{"type":"select","id":"value","name":"value","values":{"N":"\u0422\u043e\u043b\u044c\u043a\u043e \u0442\u043e\u0432\u0430\u0440\u044b \u0431\u0435\u0437 \u0441\u043a\u0438\u0434\u043a\u0438","Y":"\u0422\u043e\u043b\u044c\u043a\u043e \u0442\u043e\u0432\u0430\u0440\u044b \u0441\u043e \u0441\u043a\u0438\u0434\u043a\u043e\u0439"},"defaultValue":"N"}]},{"controlId":"discount_size","group":false,"label":"\u0420\u0430\u0437\u043c\u0435\u0440 \u0441\u043a\u0438\u0434\u043a\u0438 (\u043d\u0430 \u0435\u0434\u0438\u043d\u0438\u0446\u0443 \u0442\u043e\u0432\u0430\u0440\u0430)","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0420\u0430\u0437\u043c\u0435\u0440 \u0441\u043a\u0438\u0434\u043a\u0438 (\u043d\u0430 \u0435\u0434\u0438\u043d\u0438\u0446\u0443 \u0442\u043e\u0432\u0430\u0440\u0430)"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Great":"\u0431\u043e\u043b\u044c\u0448\u0435","Less":"\u043c\u0435\u043d\u044c\u0448\u0435","EqGr":"\u0431\u043e\u043b\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e","EqLs":"\u043c\u0435\u043d\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0431\u043e\u043b\u044c\u0448\u0435","defaultValue":"Great"},{"type":"input","id":"value","name":"value","show_value":"Y","defaultValue":"0","logictimType":"float"},{"type":"select","id":"type","name":"type","values":{"P":"%","C":"\u0440\u0443\u0431\u043b\u0435\u0439 (\u0432\u0430\u043b\u044e\u0442\u044b \u0446\u0435\u043d\u044b)"},"defaultValue":"P"}]}]},{"controlgroup":"1","group":false,"label":"\u041f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u044b \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0435","showIn":["conditionGroup","conditionGroup2"],"children":[{"controlId":"product_prop_in_cart","group":false,"label":"\u0421\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0442\u043e\u0432\u0430\u0440\u0430 \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0435","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0421\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0442\u043e\u0432\u0430\u0440\u0430 \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0435"},{"id":"logic-type","name":"logic-type","type":"select","values":{"xml_id":"\u0441 \u0441\u0438\u043c\u0432\u043e\u043b\u044c\u043d\u044b\u043c \u043a\u043e\u0434\u043e\u043c","name":"\u0441 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435\u043c"},"defaultText":"\u0441 \u0441\u0438\u043c\u0432\u043e\u043b\u044c\u043d\u044b\u043c \u043a\u043e\u0434\u043e\u043c","defaultValue":"xml_id"},{"type":"input","id":"logic-type_value","name":"logic-type_value","show_value":"Y","defaultValue":""},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value","show_value":"Y","defaultValue":""}]}]},{"controlgroup":true,"group":false,"label":"\u0421\u0432\u043e\u0439\u0441\u0442\u0432\u0430 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]","showIn":["conditionGroup","conditionGroup2"],"children":[{"controlId":"CondIBProp:2:2","group":false,"label":"\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a \u043e\u043a\u043d\u0430 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a \u043e\u043a\u043d\u0430 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:3","group":false,"label":"\u041a\u043b\u044e\u0447\u0435\u0432\u044b\u0435 \u0441\u043b\u043e\u0432\u0430","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041a\u043b\u044e\u0447\u0435\u0432\u044b\u0435 \u0441\u043b\u043e\u0432\u0430 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:4","group":false,"label":"\u041c\u0435\u0442\u0430-\u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041c\u0435\u0442\u0430-\u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:5","group":false,"label":"\u0411\u0440\u0435\u043d\u0434","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0411\u0440\u0435\u043d\u0434 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"5"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:2:6","group":false,"label":"\u041d\u043e\u0432\u0438\u043d\u043a\u0430","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041d\u043e\u0432\u0438\u043d\u043a\u0430 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"6"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:2:7","group":false,"label":"\u041b\u0438\u0434\u0435\u0440 \u043f\u0440\u043e\u0434\u0430\u0436","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041b\u0438\u0434\u0435\u0440 \u043f\u0440\u043e\u0434\u0430\u0436 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"7"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:2:8","group":false,"label":"\u0421\u043f\u0435\u0446\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0421\u043f\u0435\u0446\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"8"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:2:9","group":false,"label":"\u0410\u0440\u0442\u0438\u043a\u0443\u043b","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0410\u0440\u0442\u0438\u043a\u0443\u043b \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:10","group":false,"label":"\u041f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044c","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044c \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:11","group":false,"label":"\u041c\u0430\u0442\u0435\u0440\u0438\u0430\u043b","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041c\u0430\u0442\u0435\u0440\u0438\u0430\u043b \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:12","group":false,"label":"\u0426\u0432\u0435\u0442","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0426\u0432\u0435\u0442 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:15","group":false,"label":"ID \u043f\u043e\u0441\u0442\u0430 \u0431\u043b\u043e\u0433\u0430 \u0434\u043b\u044f \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0435\u0432","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e ID \u043f\u043e\u0441\u0442\u0430 \u0431\u043b\u043e\u0433\u0430 \u0434\u043b\u044f \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0435\u0432 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Great":"\u0431\u043e\u043b\u044c\u0448\u0435","Less":"\u043c\u0435\u043d\u044c\u0448\u0435","EqGr":"\u0431\u043e\u043b\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e","EqLs":"\u043c\u0435\u043d\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:16","group":false,"label":"\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0435\u0432","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0435\u0432 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Great":"\u0431\u043e\u043b\u044c\u0448\u0435","Less":"\u043c\u0435\u043d\u044c\u0448\u0435","EqGr":"\u0431\u043e\u043b\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e","EqLs":"\u043c\u0435\u043d\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:14","group":false,"label":"\u0421 \u044d\u0442\u0438\u043c \u0442\u043e\u0432\u0430\u0440\u043e\u043c \u0440\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u043c","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0421 \u044d\u0442\u0438\u043c \u0442\u043e\u0432\u0430\u0440\u043e\u043c \u0440\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u043c \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"popup","popup_url":"\/bitrix\/admin\/iblock_element_search.php","popup_params":{"lang":"ru","IBLOCK_ID":"2","discount":"Y"},"param_id":"n","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:18","group":false,"label":"\u0422\u0440\u0435\u043d\u0434\u044b","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0422\u0440\u0435\u043d\u0434\u044b \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"18"},"id":"value","name":"value"}]}]},{"controlgroup":true,"group":false,"label":"\u0421\u0432\u043e\u0439\u0441\u0442\u0432\u0430 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f) [3]","showIn":["conditionGroup","conditionGroup2"],"children":[{"controlId":"CondIBProp:3:20","group":false,"label":"\u0410\u0440\u0442\u0438\u043a\u0443\u043b","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0410\u0440\u0442\u0438\u043a\u0443\u043b \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f) [3]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:3:21","group":false,"label":"\u0426\u0432\u0435\u0442","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0426\u0432\u0435\u0442 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f) [3]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"21"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:3:22","group":false,"label":"\u0420\u0430\u0437\u043c\u0435\u0440\u044b \u043e\u0431\u0443\u0432\u0438","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0420\u0430\u0437\u043c\u0435\u0440\u044b \u043e\u0431\u0443\u0432\u0438 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f) [3]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"22"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:3:23","group":false,"label":"\u0420\u0430\u0437\u043c\u0435\u0440\u044b \u043e\u0434\u0435\u0436\u0434\u044b ","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0420\u0430\u0437\u043c\u0435\u0440\u044b \u043e\u0434\u0435\u0436\u0434\u044b  \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f) [3]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"23"},"id":"value","name":"value"}]}]},{"controlId":"CondGroup","group":true,"label":"","defaultText":"","showIn":[],"control":["CONDITION_PERFORM_OPERATIONS"]}]';
-
-//        echo "<pre>";
-//        print_r(\Bitrix\Main\Web\Json::decode($str)); die();
-
         if($mode=='json'){
-//            return  \Bitrix\Main\Web\Json::encode($params);
-            return '[{"controlId":"conditionGroup","group":true,"label":"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043f\u0440\u0430\u0432\u0438\u043b\u043e \u043e\u043f\u043b\u0430\u0442\u044b \u0431\u043e\u043d\u0443\u0441\u0430\u043c\u0438","showIn":["CondGroup"],"visual":{"controls":["All","True"],"values":[{"All":"AND","True":"True"},{"All":"OR","True":"True"}],"logic":[{"style":"condition-logic-and","message":"\u0418"},{"style":"condition-logic-or","message":"\u0418\u041b\u0418"}]},"control":["\u0420\u0430\u0437\u0440\u0435\u0448\u0438\u0442\u044c \u043e\u043f\u043b\u0430\u0447\u0438\u0432\u0430\u0442\u044c ",{"id":"bonus","name":"bonus","type":"input","show_value":"Y","defaultValue":"10"},{"id":"bonus_type","name":"bonus_type","type":"select","values":{"percent":"\u043f\u0440\u043e\u0446\u0435\u043d\u0442\u043e\u0432","bonus":"\u0431\u043e\u043d\u0443\u0441\u043e\u0432"},"defaultText":"\u043f\u0440\u043e\u0446\u0435\u043d\u0442\u043e\u0432","defaultValue":"percent"},"\u0441\u0442\u043e\u0438\u043c\u043e\u0441\u0442\u0438 \u0442\u043e\u0432\u0430\u0440\u0430 \u0441 \u043e\u043a\u0440\u0443\u0433\u043b\u0435\u043d\u0438\u0435\u043c \u0431\u043e\u043d\u0443\u0441\u043e\u0432 \u0437\u0430",{"id":"round_type","name":"round_type","type":"select","values":{"UNIT":"\u0435\u0434\u0438\u043d\u0438\u0446\u0443 \u0442\u043e\u0432\u0430\u0440\u0430","POSITION":"\u0432\u0441\u044e \u043f\u043e\u0437\u0438\u0446\u0438\u044e \u0442\u043e\u0432\u0430\u0440\u0430"},"defaultValue":"UNIT","defaultText":"\u0435\u0434\u0438\u043d\u0438\u0446\u0443 \u0442\u043e\u0432\u0430\u0440\u0430"},"\u0434\u043e",{"id":"round","name":"round","type":"select","values":{"A":"0","B":"1","C":"2","D":"3","E":"4"},"defaultValue":"C","defaultText":"2"},"\u0437\u043d\u0430\u043a\u043e\u0432 \u043f\u043e\u0441\u043b\u0435 \u0437\u0430\u043f\u044f\u0442\u043e\u0439, \u0434\u043b\u044f \u043a\u043e\u0442\u043e\u0440\u044b\u0445",{"id":"All","name":"All","type":"select","values":{"AND":"\u0432\u0441\u0435 \u0443\u0441\u043b\u043e\u0432\u0438\u044f","OR":"\u043b\u044e\u0431\u043e\u0435 \u0438\u0437 \u0443\u0441\u043b\u043e\u0432\u0438\u0439"},"defaultText":"\u043b\u044e\u0431\u043e\u0435 \u0438\u0437 \u0443\u0441\u043b\u043e\u0432\u0438\u0439","defaultValue":"OR"},{"id":"True","name":"True","type":"select","values":{"True":"\u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d\u043e(\u044b)"},"defaultText":"\u0432\u044b\u043f\u043e\u043b\u043d\u0435\u043d\u043e(\u044b)","defaultValue":"True"}],"mess":{"ADD_CONTROL":"\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0443\u0441\u043b\u043e\u0432\u0438\u0435","SELECT_CONTROL":"\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0443\u0441\u043b\u043e\u0432\u0438\u0435"}},{"controlgroup":"1","group":false,"label":"\u041e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u043f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u044b","showIn":["conditionGroup","conditionGroup2"],"children":[{"controlId":"iblock","group":false,"label":"\u0418\u043d\u0444\u043e\u0431\u043b\u043e\u043a","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0418\u043d\u0444\u043e\u0431\u043b\u043e\u043a"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"select","multiple":"Y","values":{"2":"\u041e\u0434\u0435\u0436\u0434\u0430","3":"\u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f)"},"id":"value","name":"value","show_value":"Y","first_option":"...","defaultText":"...","defaultValue":""}]},{"controlId":"product_categoty","group":false,"label":"\u0420\u0430\u0437\u0434\u0435\u043b","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0420\u0430\u0437\u0434\u0435\u043b"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"popup","popup_url":"iblock_section_search.php","popup_params":{"lang":"ru","discount":"Y","simplename":"Y"},"param_id":"n","multiple":"Y","show_value":"Y","id":"value","name":"value"}]},{"controlId":"product","description":"","group":false,"label":"\u0422\u043e\u0432\u0430\u0440","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0422\u043e\u0432\u0430\u0440"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"multiDialog","popup_url":"cat_product_search_dialog.php","popup_params":{"lang":"ru","caller":"discount_rules","allow_select_parent":"Y"},"param_id":"n","show_value":"Y","id":"value","name":"value"}]},{"controlId":"price","group":false,"label":"\u0426\u0435\u043d\u0430","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0426\u0435\u043d\u0430"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Great":"\u0431\u043e\u043b\u044c\u0448\u0435","Less":"\u043c\u0435\u043d\u044c\u0448\u0435","EqGr":"\u0431\u043e\u043b\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e","EqLs":"\u043c\u0435\u043d\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0431\u043e\u043b\u044c\u0448\u0435","defaultValue":"Great"},{"type":"input","id":"value","name":"value","show_value":"Y","defaultValue":"0","logictimType":"float"}]},{"controlId":"discount","group":false,"label":"\u041d\u0430\u043b\u0438\u0447\u0438\u0435 \u0441\u043a\u0438\u0434\u043a\u0438","showIn":["conditionGroup","conditionGroup2"],"control":[{"type":"select","id":"value","name":"value","values":{"N":"\u0422\u043e\u043b\u044c\u043a\u043e \u0442\u043e\u0432\u0430\u0440\u044b \u0431\u0435\u0437 \u0441\u043a\u0438\u0434\u043a\u0438","Y":"\u0422\u043e\u043b\u044c\u043a\u043e \u0442\u043e\u0432\u0430\u0440\u044b \u0441\u043e \u0441\u043a\u0438\u0434\u043a\u043e\u0439"},"defaultValue":"N"}]},{"controlId":"discount_size","group":false,"label":"\u0420\u0430\u0437\u043c\u0435\u0440 \u0441\u043a\u0438\u0434\u043a\u0438 (\u043d\u0430 \u0435\u0434\u0438\u043d\u0438\u0446\u0443 \u0442\u043e\u0432\u0430\u0440\u0430)","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0420\u0430\u0437\u043c\u0435\u0440 \u0441\u043a\u0438\u0434\u043a\u0438 (\u043d\u0430 \u0435\u0434\u0438\u043d\u0438\u0446\u0443 \u0442\u043e\u0432\u0430\u0440\u0430)"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Great":"\u0431\u043e\u043b\u044c\u0448\u0435","Less":"\u043c\u0435\u043d\u044c\u0448\u0435","EqGr":"\u0431\u043e\u043b\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e","EqLs":"\u043c\u0435\u043d\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0431\u043e\u043b\u044c\u0448\u0435","defaultValue":"Great"},{"type":"input","id":"value","name":"value","show_value":"Y","defaultValue":"0","logictimType":"float"},{"type":"select","id":"type","name":"type","values":{"P":"%","C":"\u0440\u0443\u0431\u043b\u0435\u0439 (\u0432\u0430\u043b\u044e\u0442\u044b \u0446\u0435\u043d\u044b)"},"defaultValue":"P"}]}]},{"controlgroup":"1","group":false,"label":"\u041f\u0430\u0440\u0430\u043c\u0435\u0442\u0440\u044b \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0435","showIn":["conditionGroup","conditionGroup2"],"children":[{"controlId":"product_prop_in_cart","group":false,"label":"\u0421\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0442\u043e\u0432\u0430\u0440\u0430 \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0435","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0421\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0442\u043e\u0432\u0430\u0440\u0430 \u0432 \u043a\u043e\u0440\u0437\u0438\u043d\u0435"},{"id":"logic-type","name":"logic-type","type":"select","values":{"xml_id":"\u0441 \u0441\u0438\u043c\u0432\u043e\u043b\u044c\u043d\u044b\u043c \u043a\u043e\u0434\u043e\u043c","name":"\u0441 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435\u043c"},"defaultText":"\u0441 \u0441\u0438\u043c\u0432\u043e\u043b\u044c\u043d\u044b\u043c \u043a\u043e\u0434\u043e\u043c","defaultValue":"xml_id"},{"type":"input","id":"logic-type_value","name":"logic-type_value","show_value":"Y","defaultValue":""},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value","show_value":"Y","defaultValue":""}]}]},{"controlgroup":true,"group":false,"label":"\u0421\u0432\u043e\u0439\u0441\u0442\u0432\u0430 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]","showIn":["conditionGroup","conditionGroup2"],"children":[{"controlId":"CondIBProp:2:2","group":false,"label":"\u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a \u043e\u043a\u043d\u0430 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0417\u0430\u0433\u043e\u043b\u043e\u0432\u043e\u043a \u043e\u043a\u043d\u0430 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0430 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:3","group":false,"label":"\u041a\u043b\u044e\u0447\u0435\u0432\u044b\u0435 \u0441\u043b\u043e\u0432\u0430","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041a\u043b\u044e\u0447\u0435\u0432\u044b\u0435 \u0441\u043b\u043e\u0432\u0430 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:4","group":false,"label":"\u041c\u0435\u0442\u0430-\u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041c\u0435\u0442\u0430-\u043e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:5","group":false,"label":"\u0411\u0440\u0435\u043d\u0434","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0411\u0440\u0435\u043d\u0434 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"5"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:2:6","group":false,"label":"\u041d\u043e\u0432\u0438\u043d\u043a\u0430","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041d\u043e\u0432\u0438\u043d\u043a\u0430 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"6"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:2:7","group":false,"label":"\u041b\u0438\u0434\u0435\u0440 \u043f\u0440\u043e\u0434\u0430\u0436","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041b\u0438\u0434\u0435\u0440 \u043f\u0440\u043e\u0434\u0430\u0436 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"7"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:2:8","group":false,"label":"\u0421\u043f\u0435\u0446\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0421\u043f\u0435\u0446\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u0435 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"8"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:2:9","group":false,"label":"\u0410\u0440\u0442\u0438\u043a\u0443\u043b","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0410\u0440\u0442\u0438\u043a\u0443\u043b \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:10","group":false,"label":"\u041f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044c","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442\u0435\u043b\u044c \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:11","group":false,"label":"\u041c\u0430\u0442\u0435\u0440\u0438\u0430\u043b","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041c\u0430\u0442\u0435\u0440\u0438\u0430\u043b \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:12","group":false,"label":"\u0426\u0432\u0435\u0442","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0426\u0432\u0435\u0442 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:15","group":false,"label":"ID \u043f\u043e\u0441\u0442\u0430 \u0431\u043b\u043e\u0433\u0430 \u0434\u043b\u044f \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0435\u0432","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e ID \u043f\u043e\u0441\u0442\u0430 \u0431\u043b\u043e\u0433\u0430 \u0434\u043b\u044f \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0435\u0432 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Great":"\u0431\u043e\u043b\u044c\u0448\u0435","Less":"\u043c\u0435\u043d\u044c\u0448\u0435","EqGr":"\u0431\u043e\u043b\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e","EqLs":"\u043c\u0435\u043d\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:16","group":false,"label":"\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0435\u0432","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0435\u0432 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Great":"\u0431\u043e\u043b\u044c\u0448\u0435","Less":"\u043c\u0435\u043d\u044c\u0448\u0435","EqGr":"\u0431\u043e\u043b\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e","EqLs":"\u043c\u0435\u043d\u044c\u0448\u0435 \u043b\u0438\u0431\u043e \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:14","group":false,"label":"\u0421 \u044d\u0442\u0438\u043c \u0442\u043e\u0432\u0430\u0440\u043e\u043c \u0440\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u043c","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0421 \u044d\u0442\u0438\u043c \u0442\u043e\u0432\u0430\u0440\u043e\u043c \u0440\u0435\u043a\u043e\u043c\u0435\u043d\u0434\u0443\u0435\u043c \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"popup","popup_url":"\/bitrix\/admin\/iblock_element_search.php","popup_params":{"lang":"ru","IBLOCK_ID":"2","discount":"Y"},"param_id":"n","id":"value","name":"value"}]},{"controlId":"CondIBProp:2:18","group":false,"label":"\u0422\u0440\u0435\u043d\u0434\u044b","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0422\u0440\u0435\u043d\u0434\u044b \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 [2]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"18"},"id":"value","name":"value"}]}]},{"controlgroup":true,"group":false,"label":"\u0421\u0432\u043e\u0439\u0441\u0442\u0432\u0430 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f) [3]","showIn":["conditionGroup","conditionGroup2"],"children":[{"controlId":"CondIBProp:3:20","group":false,"label":"\u0410\u0440\u0442\u0438\u043a\u0443\u043b","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0410\u0440\u0442\u0438\u043a\u0443\u043b \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f) [3]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e","Contain":"\u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442","NotCont":"\u043d\u0435 \u0441\u043e\u0434\u0435\u0440\u0436\u0438\u0442"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"input","id":"value","name":"value"}]},{"controlId":"CondIBProp:3:21","group":false,"label":"\u0426\u0432\u0435\u0442","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0426\u0432\u0435\u0442 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f) [3]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"21"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:3:22","group":false,"label":"\u0420\u0430\u0437\u043c\u0435\u0440\u044b \u043e\u0431\u0443\u0432\u0438","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0420\u0430\u0437\u043c\u0435\u0440\u044b \u043e\u0431\u0443\u0432\u0438 \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f) [3]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"22"},"id":"value","name":"value"}]},{"controlId":"CondIBProp:3:23","group":false,"label":"\u0420\u0430\u0437\u043c\u0435\u0440\u044b \u043e\u0434\u0435\u0436\u0434\u044b ","showIn":["conditionGroup","conditionGroup2"],"control":[{"id":"prefix","type":"prefix","text":"\u0441\u0432\u043e\u0439\u0441\u0442\u0432\u043e \u0420\u0430\u0437\u043c\u0435\u0440\u044b \u043e\u0434\u0435\u0436\u0434\u044b  \u0438\u043d\u0444\u043e\u0431\u043b\u043e\u043a\u0430 \u041e\u0434\u0435\u0436\u0434\u0430 (\u043f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0438\u044f) [3]"},{"id":"logic","name":"logic","type":"select","values":{"Equal":"\u0440\u0430\u0432\u043d\u043e","Not":"\u043d\u0435 \u0440\u0430\u0432\u043d\u043e"},"defaultText":"\u0440\u0430\u0432\u043d\u043e","defaultValue":"Equal"},{"type":"lazySelect","load_url":"\/bitrix\/tools\/catalog\/get_property_values.php","load_params":{"lang":"ru","propertyId":"23"},"id":"value","name":"value"}]}]},{"controlId":"CondGroup","group":true,"label":"","defaultText":"","showIn":[],"control":["CONDITION_PERFORM_OPERATIONS"]}]';
+            return \Bitrix\Main\Web\Json::encode($params);
         }
         return $params;
 
     }
 
+    public static function Controls($mode='', $type = 'order')
+    {
+        $arSites = ItbHelpers::GetListSties();
+        $arUserGroups = ItbHelpers::GetUserGroups();
+        $basketRules = ItbHelpers::getBasketRules();
+        $arPaySystems = array();
+        foreach(ItbHelpers::getPaySystems() as $arPaySystem){
+            $arPaySystems[$arPaySystem['ID']] = $arPaySystem['NAME'];
+        }
+        $arDelivery = array();
+        foreach(ItbHelpers::getDelivery() as $delivery){
+            $arDelivery[$delivery['ID']] = $delivery['NAME'];
+        }
+        $arPersonTypes = ItbHelpers::getPersonTypes();
+        $arOrderStatuses = ItbHelpers::GetOrderStatuses();
+        $arOrderStatuses = array_merge(array('All'=>GetMessage("ITB_COND_COUNT_ORDERS_ALL")), $arOrderStatuses);
+
+        $params = array();
+
+        $params[]=array(
+            'controlId'=> 'CondGroup',
+            'group'=> true,
+            'label'=> '',
+            'defaultText'=> '',
+            'showIn'=> array(),
+            'control'=> array('CONDITION_PERFORM_OPERATIONS')
+        );
+
+        $params[] = array(
+            'controlgroup'=> '1',
+            'group'=> true,
+            'label'=> GetMessage("ITB_COND_MAIN_PARAMS"),
+            'showIn'=> array('CondGroup'),
+            'children'=> array(
+                array(
+                    'controlId'=> 'sites',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_SITE"),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_SITE")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'Equal' => GetMessage("ITB_COND_EQUAL"),
+                                'Not' => GetMessage("ITB_COND_NOT")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_EQUAL"),
+                            'defaultValue' => 'Equal'
+                        ),
+                        array(
+                            'type'=> 'select',
+                            'multiple'=>'Y',
+                            'values'=> $arSites,
+                            'id'=> 'value',
+                            'name'=> 'value',
+                            'show_value'=>'Y',
+                            'first_option'=> '...',
+                            'defaultText'=> '...',
+                            'defaultValue'=> ''
+                        )
+                    )
+                ),
+                array(
+                    'controlId'=> 'userGroups',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_USER_GROUP"),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_USER_GROUP")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'Equal' => GetMessage("ITB_COND_EQUAL"),
+                                'Not' => GetMessage("ITB_COND_NOT")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_EQUAL"),
+                            'defaultValue' => 'Equal'
+                        ),
+                        array(
+                            'type'=> 'select',
+                            'multiple'=>'Y',
+                            'values'=> $arUserGroups,
+                            'id'=> 'value',
+                            'name'=> 'value',
+                            'show_value'=>'Y',
+                            'first_option'=> '...',
+                            'defaultText'=> '...',
+                            'defaultValue'=> ''
+                        )
+                    )
+                ),
+                array(
+                    'controlId'=> 'pay_bonus',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_PAY_BONUS"),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_PAY_BONUS")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'Equal' => GetMessage("ITB_COND_HAVE"),
+                                'Not' => GetMessage("ITB_COND_HAVE_NO")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_HAVE_NO"),
+                            'defaultValue' => 'Not'
+                        ),
+                    )
+                ),
+
+            )
+        );
+
+        $params[] = array(
+            'controlgroup'=> '1',
+            'group'=> true,
+            'label'=> GetMessage("ITB_COND_OTHER_PARAMS"),
+            'showIn'=> array('CondGroup'),
+            'children'=> array(
+                array(
+                    'controlId'=> 'MainUserId',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_USERS_ID"),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_USERS_ID")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'Equal' => GetMessage("ITB_COND_EQUAL"),
+                                'Not' => GetMessage("ITB_COND_NOT")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_EQUAL"),
+                            'defaultValue' => 'Equal'
+                        ),
+                        array(
+                            'type' => 'userPopup',
+                            'popup_url' => '/bitrix/admin/user_search.php',
+                            'popup_params' => array('FN'=>'logictim_profile'),
+                            'param_id' => 'n',
+                            'show_value'=>'Y',
+                            'user_load_url' => '/bitrix/admin/sale_discount_edit.php',
+                            'id'=> 'value',
+                            'name'=> 'value',
+                        ),
+                    )
+                ),
+                array(
+                    'controlId'=> 'orderRowNum',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_USER_ORDERS_COUNT_ROW").($type == 'order_referal' ? ' '.GetMessage("ITB_COND_USER_REFERALA_POSTFIX") : ''),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_USER_ORDERS_COUNT_ROW_USE")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'Evry' => GetMessage("ITB_COND_USER_ORDERS_COUNT_ROW_EVRY"),
+                                'Only' => GetMessage("ITB_COND_USER_ORDERS_COUNT_ROW_ONLY"),
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_USER_ORDERS_COUNT_ROW_EVRY"),
+                            'defaultValue' => 'Evry'
+                        ),
+                        array(
+                            'type'=> 'input',
+                            'id'=> 'ordersCount',
+                            'name'=> 'ordersCount',
+                            'show_value'=>'Y',
+                            'defaultValue' => '2'
+                        ),
+                        GetMessage("ITB_COND_USER_POSTFIX_IY"),
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_USER_ORDERS_COUNT_ROW_ORDER")),
+                        '( '.GetMessage("ITB_COND_COUNT_ORDERS_TEXT_1"),
+                        array(
+                            'id' => 'type_count',
+                            'name' => 'type_count',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'Include' => GetMessage("ITB_COND_COUNT_TYPE_ORDERS_INCLUDE"),
+                                'Exclude' => GetMessage("ITB_COND_COUNT_TYPE_ORDERS_NOT_INCLUDE"),
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_COUNT_TYPE_ORDERS_INCLUDE"),
+                            'defaultValue' => 'Include'
+                        ),
+                        array(
+                            'id' => 'cancell',
+                            'name' => 'cancell',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'All' => GetMessage("ITB_COND_COUNT_ORDERS_ALL"),
+                                'Cancell' => GetMessage("ITB_COND_COUNT_ORDERS_CANCELL"),
+                                'NotCancell' => GetMessage("ITB_COND_COUNT_ORDERS_NOT_CANCELL"),
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_COUNT_ORDERS_ALL"),
+                            'defaultValue' => 'All'
+                        ),
+                        array(
+                            'id' => 'paid',
+                            'name' => 'paid',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'All' => GetMessage("ITB_COND_COUNT_ORDERS_ALL"),
+                                'Paid' => GetMessage("ITB_COND_COUNT_ORDERS_PAID"),
+                                'NotPaid' => GetMessage("ITB_COND_COUNT_ORDERS_NOT_PAID"),
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_COUNT_ORDERS_ALL"),
+                            'defaultValue' => 'All'
+                        ),
+                        GetMessage("ITB_COND_COUNT_ORDERS_STATUS"),
+                        array(
+                            'id' => 'order_status',
+                            'name' => 'order_status',
+                            'type' => 'select',
+                            'values' => $arOrderStatuses,
+                            'defaultText' => GetMessage("ITB_COND_COUNT_ORDERS_ALL"),
+                            'defaultValue' => 'All'
+                        ),
+                        ')'
+                    )
+                ),
+                array(
+                    'controlId'=> 'ordersSum',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_USER_ORDERS_SUM").($type == 'order_referal' ? ' '.GetMessage("ITB_COND_USER_REFERALA_POSTFIX") : ''),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_USER_ORDERS_SUM")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'EqGr' => GetMessage("ITB_COND_EQGR"),
+                                'Less' => GetMessage("ITB_COND_LESS")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_EQGR"),
+                            'defaultValue' => 'EqGr'
+                        ),
+                        array(
+                            'type'=> 'input',
+                            'id'=> 'ordersSum',
+                            'name'=> 'ordersSum',
+                            'show_value'=>'Y',
+                            'defaultValue' => '0'
+                        ),
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_FOR_PERIOD")),
+                        array(
+                            'type'=> 'input',
+                            'id'=> 'period',
+                            'name'=> 'period',
+                            'defaultValue' => '1'
+                        ),
+                        array(
+                            'type'=> 'select',
+                            'id'=> 'period_type',
+                            'name'=> 'period_type',
+                            'values' => array
+                            (
+                                'D' => GetMessage("ITB_COND_DAY"),
+                                'M' => GetMessage("ITB_COND_MONTH"),
+                                'Y' => GetMessage("ITB_COND_YEAR")
+                            ),
+                            'defaultValue' => 'Y',
+                            'defaultText' => GetMessage("ITB_COND_YEAR")
+                        ),
+                    )
+                ),
+                array(
+                    'controlId'=> 'firstOrderDate',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_USER_FIRST_ORDER_DATE").($type == 'order_referal' ? ' '.GetMessage("ITB_COND_USER_REFERALA_POSTFIX") : ''),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_USER_FIRST_ORDER_DATE_USE")),
+                        array(
+                            'type'=> 'input',
+                            'id'=> 'order_num',
+                            'name'=> 'order_num',
+                            'defaultValue' => '1'
+                        ),
+                        GetMessage("ITB_COND_USER_POSTFIX_GO"),
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>($type == 'order_referal' ? GetMessage("ITB_COND_USER_FIRST_ORDER_DATE_USE_1_REFERAL") : GetMessage("ITB_COND_USER_FIRST_ORDER_DATE_USE_1"))),
+                        array(
+                            'type'=> 'input',
+                            'id'=> 'period',
+                            'name'=> 'period',
+                            'defaultValue' => '1'
+                        ),
+                        array(
+                            'type'=> 'select',
+                            'id'=> 'period_type',
+                            'name'=> 'period_type',
+                            'values' => array
+                            (
+                                'D' => GetMessage("ITB_COND_DAY"),
+                                'M' => GetMessage("ITB_COND_MONTH"),
+                                'Y' => GetMessage("ITB_COND_YEAR")
+                            ),
+                            'defaultValue' => 'Y',
+                            'defaultText' => GetMessage("ITB_COND_YEAR")
+                        ),
+                    )
+                ),
+                array(
+                    'controlId'=> 'registrationDate',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_USER_REGISTRATION_DATE").($type == 'order_referal' ? ' '.GetMessage("ITB_COND_USER_REFERALA_POSTFIX") : ''),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>($type == 'order_referal' ? GetMessage("ITB_COND_USER_REGISTRATION_DATE_USE_REFERAL") : GetMessage("ITB_COND_USER_REGISTRATION_DATE_USE"))),
+                        array(
+                            'type'=> 'input',
+                            'id'=> 'period',
+                            'name'=> 'period',
+                            'defaultValue' => '1'
+                        ),
+                        array(
+                            'type'=> 'select',
+                            'id'=> 'period_type',
+                            'name'=> 'period_type',
+                            'values' => array
+                            (
+                                'D' => GetMessage("ITB_COND_DAY"),
+                                'M' => GetMessage("ITB_COND_MONTH"),
+                                'Y' => GetMessage("ITB_COND_YEAR")
+                            ),
+                            'defaultValue' => 'Y',
+                            'defaultText' => GetMessage("ITB_COND_YEAR")
+                        ),
+                    )
+                ),
+                array(
+                    'controlId'=> 'cartSum',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_CART_SUM"),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_CART_SUM")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'EqGr' => GetMessage("ITB_COND_EQGR"),
+                                'Less' => GetMessage("ITB_COND_LESS")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_EQGR"),
+                            'defaultValue' => 'EqGr'
+                        ),
+                        array(
+                            'type'=> 'input',
+                            'id'=> 'value',
+                            'name'=> 'value',
+                            'show_value'=>'Y',
+                            'defaultValue' => '0'
+                        )
+                    )
+                ),
+                array(
+                    'controlId'=> 'orderSum',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_ORDER_SUM"),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_ORDER_SUM")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'EqGr' => GetMessage("ITB_COND_EQGR"),
+                                'Less' => GetMessage("ITB_COND_LESS")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_EQGR"),
+                            'defaultValue' => 'EqGr'
+                        ),
+                        array(
+                            'type'=> 'input',
+                            'id'=> 'value',
+                            'name'=> 'value',
+                            'show_value'=>'Y',
+                            'defaultValue' => '0'
+                        )
+                    )
+                ),
+                array(
+                    'controlId'=> 'basketRules',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_BASKET_RULES"),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_BASKET_RULES")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'Equal' => GetMessage("ITB_COND_EQUAL_USE"),
+                                'Not' => GetMessage("ITB_COND_NOT_USE")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_EQUAL"),
+                            'defaultValue' => 'Equal'
+                        ),
+                        array(
+                            'type'=> 'select',
+                            'multiple'=>'Y',
+                            'size'=> 7,
+                            'values'=> $basketRules,
+                            'show_value'=>'Y',
+                            'id'=> 'value',
+                            'name'=> 'value',
+                        )
+                    )
+                ),
+                array(
+                    'controlId'=> 'paySystems',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_PAY_SYSTEM"),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_PAY_SYSTEM")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'Equal' => GetMessage("ITB_COND_EQUAL"),
+                                'Not' => GetMessage("ITB_COND_NOT")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_EQUAL"),
+                            'defaultValue' => 'Equal'
+                        ),
+                        array(
+                            'type'=> 'select',
+                            'multiple'=>'Y',
+                            'values'=> $arPaySystems,
+                            'show_value'=>'Y',
+                            'id'=> 'value',
+                            'name'=> 'value',
+                        )
+                    )
+                ),
+                array(
+                    'controlId'=> 'delivery',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_DELIVERY_SYSTEM"),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_DELIVERY_SYSTEM")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'Equal' => GetMessage("ITB_COND_EQUAL"),
+                                'Not' => GetMessage("ITB_COND_NOT")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_EQUAL"),
+                            'defaultValue' => 'Equal'
+                        ),
+                        array(
+                            'type'=> 'select',
+                            'multiple'=>'Y',
+                            'values'=> $arDelivery,
+                            'show_value'=>'Y',
+                            'id'=> 'value',
+                            'name'=> 'value',
+                        )
+                    )
+                ),
+                array(
+                    'controlId'=> 'personTypes',
+                    'group'=> false,
+                    'label'=> GetMessage("ITB_COND_PERSON_TYPE"),
+                    'showIn'=> array('CondGroup'),
+                    'control'=> array(
+                        array('id'=>'prefix', 'type'=>'prefix', 'text'=>GetMessage("ITB_COND_PERSON_TYPE")),
+                        array(
+                            'id' => 'logic',
+                            'name' => 'logic',
+                            'type' => 'select',
+                            'values' => array
+                            (
+                                'Equal' => GetMessage("ITB_COND_EQUAL"),
+                                'Not' => GetMessage("ITB_COND_NOT")
+                            ),
+                            'defaultText' => GetMessage("ITB_COND_EQUAL"),
+                            'defaultValue' => 'Equal'
+                        ),
+                        array(
+                            'type'=> 'select',
+                            'multiple'=>'Y',
+                            'values'=> $arPersonTypes,
+                            'show_value'=>'Y',
+                            'id'=> 'value',
+                            'name'=> 'value',
+                        )
+                    )
+                ),
+            ),
+        );
+
+
+        if($mode=='json'){
+            return \Bitrix\Main\Web\Json::encode($params);
+        }
+        return $params;
+    }
+    
+    public static function SaveConditions($requestConditions)
+    {
+        $arIblocks = array();
+        foreach($requestConditions as $arCondition):
+            if(strpos($arCondition["controlId"], 'CondIBProp') !== false)
+            {
+                $arExp = explode(':', $arCondition["controlId"]);
+                $arIblocks[] = $arExp[1];
+            }
+        endforeach;
+
+        $arIBProps = array();
+        foreach($arIblocks as $iblockId):
+            $dbIbProps = \CIBlock::GetProperties($iblockId);
+            while($dbProp = $dbIbProps->Fetch())
+            {
+                $arIBProps[$dbProp["ID"]] = $dbProp;
+            }
+        endforeach;
+
+        $arConditions = array();
+        $arLevels = array(0=>0, 1=>0, 2=>0);
+        foreach($requestConditions as $key => $arCond):
+            $arKey = explode('__', $key);
+            $level = count($arKey)-1;
+
+            if($level < $lastLevel)
+            {
+                foreach($arLevels as $keyL => $ValL):
+                    if($keyL > $level)
+                        $arLevels[$keyL] = 0;
+                endforeach;
+            }
+
+
+            $id = $arLevels[$level];
+
+            $arBlock = array('id'=>$id, 'controlId'=>$arCond['controlId'], 'values'=>array());
+
+            foreach($arCond as $keyVal => $val):
+                if($keyVal == 'controlId')
+                    continue;
+
+                if(is_array($val))
+                {
+                    $arVal = $val;
+                    $val = array();
+                    foreach($arVal as $valAr):
+                        if($valAr != '')
+                            $val[] = $valAr;
+                    endforeach;
+                    $val = array_unique($val);
+                }
+
+                if($keyVal == 'value')
+                {
+                    if(strpos($arCond['controlId'], 'CondIBProp') !== false)
+                    {
+                        $arExp = explode(':', $arCondition["controlId"]);
+                        $propertyId = $arExp[2];
+                        if($arIBProps[$propertyId]["PROPERTY_TYPE"] == 'N')
+                        {
+                            $val =str_replace(',', '.', $val);
+                            $val =(float)$val;
+                            $val =(string)$val;
+                        }
+                    }
+
+                    if($arCond['controlId'] == 'price' || $arCond['controlId'] == 'cartSum'  || $arCond['controlId'] == 'orderSum')
+                    {
+                        $val =str_replace(',', '.', $val);
+                        $val =(float)$val;
+                        $val =(string)$val;
+                    }
+                }
+                elseif($keyVal == 'bonus')
+                {
+                    $val =str_replace(',', '.', $val);
+                    $val =(float)$val;
+                    $val =(string)$val;
+                }
+                elseif(is_array($keyVal))
+                {
+                    if($keyVal['controlId'] == 'bonus' || $keyVal['controlId'] == 'ordersSum')
+                    {
+                        $val =str_replace(',', '.', $val);
+                        $val =(float)$val;
+                        $val =(string)$val;
+                    }
+                }
+
+                if($arCond['controlId'] == 'orderRowNum' && $keyVal == 'ordersCount')
+                {
+                    $val = (int)$val == 0 ? 1: (int)$val;
+                    $val =(string)$val;
+                }
+
+
+                $arBlock['values'][$keyVal] = $val;
+            endforeach;
+
+            if(is_array($arBlock['values']['value']) && empty($arBlock['values']['value']) && $level > 0)
+                continue;
+
+            if(!isset($arBlock['children']))
+                $arBlock['children'] = array();
+
+            if($level == 0)
+                $arConditions = array('id'=>$id, 'controlId'=>$arCond['controlId'], 'children'=>array());
+            elseif($level == 1)
+                $arConditions['children'][$id] = $arBlock;
+            elseif($level == 2)
+                $arConditions['children'][$arLevels[$level-1]-1]['children'][$id] = $arBlock;
+
+
+            $lastLevel = $level;
+            $arLevels[$level] = $arLevels[$level]+1;
+        endforeach;
+
+        return $arConditions;
+
+        //$arConditions = \Bitrix\Main\Web\Json::encode($arConditions);
+    }
 }

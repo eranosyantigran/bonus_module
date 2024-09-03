@@ -1,13 +1,13 @@
 <?php
 global $APPLICATION;
 
-if($request['id'] == 'new'){
-    $jsonOrderBonusConditions = Itb\Bonus\Conditions\OrderBonus::OrderBaseConditions('json');
+if($request->getPost('id') == 'new'){
+    $jsonProfileConditions = Itb\Bonus\Conditions\OrderBonus::OrderBaseConditions('json');
 }else{
-    $arProfileConditions = unserialize($rs["conditions"]);
+    $arProfileConditions = unserialize($rs["CONDITIONS"]);
     $arProfileConditions = Itb\Bonus\Condition\ConditionBonus::SetLabelsOrder($arProfileConditions);
     $jsonProfileConditions = \Bitrix\Main\Web\Json::encode($arProfileConditions);
-    $jsonOrderBonusConditions = Itb\Bonus\Conditions\OrderBonus::OrderBaseConditions('json');
+//    $jsonOrderBonusConditions = Itb\Bonus\Conditions\OrderBonus::OrderBaseConditions('json');
 }
 
 if($bonus_type == 'order')
@@ -22,6 +22,8 @@ $aTabs = array(
 );
 
 $tabControl = new CAdminTabControl("tabControl".$bonus_id, $aTabs);
+
+require_once(dirname(__FILE__).'/save_bonus.php');
 
 CJSCore::Init(['core', 'ui', 'core_condtree']);
 ?>
@@ -64,9 +66,9 @@ CJSCore::Init(['core', 'ui', 'core_condtree']);
         }
         else
         {
-            $active = $rs["active"];
-            $profileName = $rs["name"];
-            $sort = $rs["sort"];
+            $active = $rs["ACTIVE"];
+            $profileName = $rs["NAME"];
+            $sort = $rs["SORT"];
 //            $arOptions = unserialize($arProfile["other_conditions"]);
             if($bonus_type == 'order')
                 $profileTypeName = GetMessage("ITB_BONUS_FROM_ORDER");
@@ -90,7 +92,7 @@ CJSCore::Init(['core', 'ui', 'core_condtree']);
                 <div id="OrderConditions"></div>
 
                 <script>
-                    var JSSaleAct=new BX.TreeConditions(<?=\Itb\Bonus\Conditions\OrderBonus::ArrayParams('json');?>, <?=$jsonOrderBonusConditions?>, <?=\Itb\Bonus\Conditions\OrderBonus::BonusOrderControls('json') ?>);
+                    var JSSaleAct=new BX.TreeConditions(<?=\Itb\Bonus\Conditions\OrderBonus::ArrayParams('json');?>, <?=$jsonProfileConditions?>, <?=\Itb\Bonus\Conditions\OrderBonus::BonusOrderControls('json') ?>);
                 </script>
             </td></tr>
 

@@ -14,8 +14,8 @@ $request = \Bitrix\Main\Context::getCurrent()->getRequest();
 
 if($request['id'] == 'new'){
     $bonus_id = 'new';
-    if($request['type'])
-        $bonus_type = $request['type'];
+    if($request['TYPE'])
+        $bonus_type = $request['TYPE'];
     else
         $bonus_type = 'order';
 }else{
@@ -24,15 +24,22 @@ if($request['id'] == 'new'){
     $rs =  BonusEventTable::getList([
         "filter" => ['ID' => $bonus_id],
     ])->Fetch();
-    $bonus_type = $rs["type"];
+    $bonus_type = $rs["TYPE"];
 
     if($request['action'] == 'copy')
         $bonus_id = 'new';
 }
 
-if (is_dir($_SERVER["DOCUMENT_ROOT"] . '/bitrix/modules/bonus_itb/'))
-    require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bonus_itb/admin/bonus_type/".$bonus_type.".php");
-else
-    require($_SERVER["DOCUMENT_ROOT"]."/local/modules/bonus_itb/admin/bonus_type/".$bonus_type.".php");
+if (!empty($bonus_type)){
+    if (is_dir($_SERVER["DOCUMENT_ROOT"] . '/bitrix/modules/bonus_itb/'))
+        require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bonus_itb/admin/bonus_type/".$bonus_type.".php");
+    else
+        require($_SERVER["DOCUMENT_ROOT"]."/local/modules/bonus_itb/admin/bonus_type/".$bonus_type.".php");
+}else{
+    if (is_dir($_SERVER["DOCUMENT_ROOT"] . '/bitrix/modules/bonus_itb/'))
+        require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bonus_itb/admin/bonus_list.php");
+    else
+        require($_SERVER["DOCUMENT_ROOT"]."/local/modules/bonus_itb/admin/bonus_list.php");
+}
 
 

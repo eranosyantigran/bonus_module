@@ -1,6 +1,7 @@
 <?php
 use Bitrix\Main\ModuleManager;
 use \Bitrix\Main\Localization\Loc;
+use Itb\Entity\BonusEventTable;
 IncludeModuleLangFile(__FILE__);
 
 Class Bonus_Itb extends CModule
@@ -47,7 +48,14 @@ Class Bonus_Itb extends CModule
         //Добавление групп и свойств в ОРДЕР
         include(dirname(__FILE__)."/include/add_order_props.php");
 
+        include(dirname(__FILE__)."/include/bonus_install.php");
+
+        //Добавление платёжной системой
+        include(dirname(__FILE__)."/include/paysystem_install.php");
+
         CopyDirFiles(dirname(__FILE__)."/admin", $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin", true, true);
+
+        RegisterModuleDependences("sale","OnSaleOrderPaid","bonus_itb","SaleOrderPaid","SaleOrderPaidAddBonus");
 
         ModuleManager::RegisterModule($this->MODULE_ID);
 
@@ -61,7 +69,10 @@ Class Bonus_Itb extends CModule
 
         include(dirname(__FILE__)."/include/delete_user_props.php");
         include(dirname(__FILE__)."/include/delete_order_props.php");
+        include(dirname(__FILE__)."/include/del_paysystem.php");
         DeleteDirFiles(dirname(__FILE__)."/admin", $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin");
+
+        UnRegisterModuleDependences("sale","OnSaleOrderPaid","bonus_itb","SaleOrderPaid","SaleOrderPaidAddBonus");
 
         ModuleManager::UnRegisterModule($this->MODULE_ID);
         return true;

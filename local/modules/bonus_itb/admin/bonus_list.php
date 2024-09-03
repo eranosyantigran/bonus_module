@@ -43,11 +43,6 @@ $lAdmin->AddHeaders(array(
         "sort"     =>"name",
         "default"  =>true,
     ),
-    array(  "id"    =>"sum_money",
-        "content"  => GetMessage("ITB_BONUS_OPERATION_SUM_MONEY"),
-        "sort"     =>"sum_money",
-        "default"  =>true,
-    ),
     array(  "id"    =>"status",
         "content"  => GetMessage("ITB_BONUS_OPERATION_STATUS"),
         "sort"     =>"status",
@@ -69,7 +64,6 @@ while ($aritem = $rsData->Fetch()){
 
     $rows->AddViewField("type", $aritem['TYPE']);
     $rows->AddViewField("name", $aritem['NAME']);
-    $rows->AddViewField("sum_money", $aritem['ADD_BONUS']);
     $rows->AddViewField("status", $aritem['ACTIVE']);
 
     $rsUser = \CUser::GetByID($aritem["USER"]);
