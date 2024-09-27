@@ -129,4 +129,20 @@ class ItbHelpers
         return $result;
     }
 
+    public static function UserBallance($user_id)
+    {
+        global $USER;
+        if(!$user_id || $user_id == '')
+            $user_id = $USER->GetID();
+
+        $arParams["SELECT"] = array("UF_BONUS_COUNT");
+        $DBUserBonus = \CUser::GetList(($by="ID"),($order="desc"),array("ID" => $user_id),$arParams);
+        if($arUserBonus = $DBUserBonus->Fetch())
+        {
+            $userBonus = $arUserBonus["UF_BONUS_COUNT"];
+        }
+
+        return $userBonus;
+    }
+
 }

@@ -14,5 +14,7 @@ CModule::AddAutoloadClasses("bonus_itb",$arClasses);
         'Itb\Bonus\Condition\ConditionBonus' => "/lib/conditions/order_conditions_save.php",
         'Itb\Bonus\ItbHelpers' => "/lib/itb_helpers.php",
         'Itb\Bonus\Event\BonusOrder' => "/lib/event/bonus_order.php",
+        'Itb\Bonus\CalculateBonus' => "/lib/calculate.php",
+        'ITB\Bonus\Ajax\OrderAjax' => "/lib/ajax/saleOrderAjax.php",
     )
 );
