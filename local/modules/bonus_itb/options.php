@@ -9,8 +9,12 @@ $module_id = 'bonus_itb';
 
 CModule::IncludeModule($module_id);
 
-$MOD_RIGHT = $APPLICATION->GetGroupRight($module_id);
+CModule::IncludeModule("sale");
+CModule::IncludeModule("catalog");
 
+
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/local/modules/'.$module_id.'/classes/module-options/version_1.php');
 
 
 ?>

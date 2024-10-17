@@ -155,7 +155,8 @@ class CalculateBonus
         $arBonusProps = array();
 
         while ($arProfil = $arProfiles->fetch()){
-                $prof =  unserialize($arProfil->fetch()['CONDITIONS'])['children'];
+
+                $prof =  unserialize($arProfil['CONDITIONS'])['children'];
                 foreach($prof as $condProf):
                     if($condProf["controlId"] == 'conditionGroup2' && $condProf["values"]["bonus_from_props"] != '')
                         $arBonusProps[] = $condProf["values"]["bonus_from_props"];
@@ -378,6 +379,7 @@ class CalculateBonus
 
         foreach($arProductList as $arItem):
             $arBonus = self::GetBonusItem($arItem, $arAllInfo, $arProfiles, $arParams);
+
             if($arParams["TYPE"] == 'cart')
             {
                 foreach($arBonus as $ibonus):
@@ -391,11 +393,12 @@ class CalculateBonus
             }
             else
                 $arResult = $arResult + $arBonus;
-            foreach($arBonus as $arItemBonus):
-                $profileId = $arItemBonus["PROFILE_RULE"]["PROFILE"];
-                if((int)$arProfiles[$profileId]["sort"] > (int)$arProfiles[$mainProfile]["sort"])
-                    $mainProfile = $arItemBonus["PROFILE_RULE"]["PROFILE"];
-            endforeach;
+
+//            foreach($arBonus as $arItemBonus):
+//                $profileId = $arItemBonus["PROFILE_RULE"]["PROFILE"];
+//                if((int)$arProfiles[$profileId]["sort"] > (int)$arProfiles[$mainProfile]["sort"])
+//                    $mainProfile = $arItemBonus["PROFILE_RULE"]["PROFILE"];
+//            endforeach;
         endforeach;
 
         if($mainProfile == -1):
@@ -430,10 +433,6 @@ class CalculateBonus
 
             $arResult["PROFILE"] = array(
                 "PROFILE_ID" => $mainProfile,
-                "ACTIVE_AFTER" => $arProfiles[$mainProfile]["active_after_period"],
-                "ACTIVE_AFTER_TYPE" => $arProfiles[$mainProfile]["active_after_type"],
-                "DEACTIVE_AFTER" => $arProfiles[$mainProfile]["deactive_after_period"],
-                "DEACTIVE_AFTER_TYPE" => $arProfiles[$mainProfile]["deactive_after_type"],
             );
         }
 
@@ -451,7 +450,904 @@ class CalculateBonus
         return $arResult;
     }
 
+    public static function GetBonusItem($arItem, $arAllInfo, $arProfiles, $arParams)
+    {
 
+        if($arParams["TYPE"] == 'cart')
+        {
+            $arAllInfo["ELEMENTS"][$arItem["ID"]]["PRICE"]["DISCOUNT_PRICE"] = $arItem["PRICE"]["DISCOUNT_PRICE"];
+            $arAllInfo["ELEMENTS"][$arItem["ID"]]["PRICE"]["DISCOUNT"] = $arItem["PRICE"]["DISCOUNT"];
+            $arAllInfo["ELEMENTS"][$arItem["ID"]]["QUANTITY"] = $arItem["QUANTITY"];
+            $arAllInfo["ELEMENTS"][$arItem["ID"]]['BASKET_PROPS'] = $arItem["BASKET_PROPS"];
+        }
+
+        $arResult = array();
+        $arBonus = self::CheckBonus($arItem["ID"], $arAllInfo, $arProfiles);
+
+        $arResult[$arItem["ID"]] = $arItem;
+
+        if(!empty($arItem["OFFERS"]))
+        {
+            foreach($arItem["OFFERS"] as $offerId):
+
+                if($arParams["TYPE"] == 'cart')
+                {
+                    $arAllInfo["ELEMENTS"][$offerId]["PRICE"]["DISCOUNT_PRICE"] = $arItem["PRICE"]["DISCOUNT_PRICE"];
+                    $arAllInfo["ELEMENTS"][$offerId]["PRICE"]["DISCOUNT"] = $arItem["PRICE"]["DISCOUNT"];
+                    $arAllInfo["ELEMENTS"][$offerId]["QUANTITY"] = $arItem["QUANTITY"];
+                    $arAllInfo["ELEMENTS"][$offerId]['BASKET_PROPS'] = $arItem["BASKET_PROPS"];
+                }
+
+                $bonusOffer = $bonusOfferView = $bonusOfferAll = 0;
+                $arBonusOffer = self::CheckBonus($offerId, $arAllInfo, $arProfiles);
+
+                $minQuantity = $arAllInfo["ELEMENTS"][$offerId]["PRICE"]["MIN_QUANTITY"];
+
+                if($arAllInfo["ELEMENTS"][$offerId]["QUANTITY"] > 0)
+                    $offerQuantity = $arAllInfo["ELEMENTS"][$offerId]["QUANTITY"];
+                else
+                    $offerQuantity = $minQuantity;
+
+                $bonusOffer = $arPrice = '';
+                if($arBonusOffer["BONUS"] > 0)
+                {
+                    if($arBonusOffer["BONUS_TYPE"] == 'bonus')
+                    {
+                        $arPrice = $arAllInfo["ELEMENTS"][$offerId]["PRICE"];
+
+                        $bonusOffer = $arBonusOffer["BONUS"];
+                        $bonusOfferAll = $arBonusOffer["BONUS"] * $offerQuantity;
+
+                        if($arBonusOffer["VIEW_IN_CATALOG"] == 'N' && $arParams["TYPE"] == 'catalog')
+                            $bonusOfferView = $bonusOfferAllView = 0;
+                        else
+                        {
+                            $bonusOfferView = $bonusOffer;
+                            $bonusOfferAllView = $bonusOfferAll;
+                        }
+
+
+                    }
+                    elseif($arBonusOffer["BONUS_TYPE"] == 'percent')
+                    {
+                        $arPrice = $arAllInfo["ELEMENTS"][$offerId]["PRICE"];
+
+                        $arBonusPosition = self::calcUnitAndPosition($arPrice, $offerQuantity, $arBonusOffer, $arParams);
+                        $bonusOffer = $arBonusPosition["BONUS_UNIT"];
+                        $bonusOfferAll = $arBonusPosition["BONUS_POSITION"];
+
+                        if($arBonusOffer["VIEW_IN_CATALOG"] == 'N' && $arParams["TYPE"] == 'catalog')
+                            $bonusOfferView = $bonusOfferAllView = 0;
+                        else
+                        {
+                            $bonusOfferView = $bonusOffer;
+                            $bonusOfferAllView = $bonusOfferAll;
+                        }
+
+
+                        if(isset($arPrice["PRICE_MATRIX"]))
+                        {
+                            $priceMatrix = array();
+                            foreach($arPrice["PRICE_MATRIX"] as $onePrice):
+                                $onePrice["ADD_BONUS"] = round($arBonusOffer["BONUS"] * $onePrice["PRICE"] / 100, $arBonusOffer["ROUND"]);
+                                if($arBonusOffer["VIEW_IN_CATALOG"] == 'N' && $arParams["TYPE"] == 'catalog')
+                                    $onePrice["VIEW_BONUS"] = 0;
+                                else
+                                    $onePrice["VIEW_BONUS"] = $onePrice["ADD_BONUS"];
+                                $priceMatrix[$onePrice["QUANTITY_HASH"]] = $onePrice;
+                            endforeach;
+                            $arPrice["PRICE_MATRIX"] = $priceMatrix;
+                        }
+                    }
+                }
+
+
+                $arResult[$offerId] = array(
+                    "ID"=>$offerId,
+                    "OFFER"=>'Y',
+                    "MAIN_PRODUCT"=>array("ID"=>$arItem["ID"]),
+                    "NAME" => $arAllInfo["ELEMENTS"][$offerId]["FIELDS"]["NAME"],
+                    "BONUS" => $arBonusOffer["BONUS"],
+                    "ADD_BONUS_UNIT" => $bonusOffer,
+                    "ADD_BONUS"=>$bonusOfferAll,
+                    "VIEW_BONUS"=>$bonusOfferView,
+                    "BONUS_TYPE"=>$arBonusOffer["BONUS_TYPE"],
+                    "QUANTITY" => $offerQuantity,
+                    "PRICE"=>$arPrice,
+                    "PROFILE_RULE" => $arBonusOffer["PROFILE_RULE"],
+                    "VIEW_IN_CATALOG" => $arBonusOffer["VIEW_IN_CATALOG"],
+                    "ROUND" => $arBonusOffer["ROUND"],
+                    "ROUND_TYPE" => $arBonusOffer["ROUND_TYPE"]
+                );
+
+                if($arParams["TYPE"] == 'cart')
+                    $arResult[$offerId]["BASKET_ITEM_ID"] = $arItem["BASKET_ITEM_ID"];
+
+                if($bonusOffer > $arResult[$arItem["ID"]]["ADD_BONUS"])
+                {
+                    $arResult[$arItem["ID"]]["NAME"] = $arAllInfo["ELEMENTS"][$arItem["ID"]]["FIELDS"]["NAME"];
+                    $arResult[$arItem["ID"]]["BONUS"] = $arBonusOffer["BONUS"];
+                    $arResult[$arItem["ID"]]["ADD_BONUS_UNIT"] = $bonusOffer;
+                    $arResult[$arItem["ID"]]["ADD_BONUS"] = $bonusOfferAll;
+                    $arResult[$arItem["ID"]]["VIEW_BONUS"] = $bonusOfferView;
+                    $arResult[$arItem["ID"]]["BONUS_TYPE"] = $arBonusOffer["BONUS_TYPE"];
+                    $arResult[$arItem["ID"]]["PRICE"] = $arPrice;
+                    $arResult[$arItem["ID"]]["PROFILE_RULE"] = $arBonusOffer["PROFILE_RULE"];
+                    $arResult[$arItem["ID"]]["ROUND"] = $arBonusOffer["ROUND"];
+                    $arResult[$arItem["ID"]]["ROUND_TYPE"] = $arBonusOffer["ROUND_TYPE"];
+                }
+
+            endforeach;
+
+        }
+        else
+        {
+            if($arBonus["BONUS"] > 0)
+            {
+                $minQuantity = $arAllInfo["ELEMENTS"][$arItem["ID"]]["PRICE"]["MIN_QUANTITY"];
+
+                if($arAllInfo["ELEMENTS"][$arItem["ID"]]["QUANTITY"] > 0)
+                    $quantity = $arAllInfo["ELEMENTS"][$arItem["ID"]]["QUANTITY"];
+                else
+                    $quantity = $minQuantity;
+
+                if($arBonus["BONUS_TYPE"] == 'bonus')
+                {
+                    $bonus = $arBonus["BONUS"];
+                    $bonusAll = $arBonus["BONUS"] * $quantity;
+
+                    if($arBonus["VIEW_IN_CATALOG"] == 'N' && $arParams["TYPE"] == 'catalog')
+                        $bonusView = $bonusAllView = 0;
+                    else
+                    {
+                        $bonusView = $bonus;
+                        $bonusAllView = $bonusAll;
+                    }
+                }
+                elseif($arBonus["BONUS_TYPE"] == 'percent')
+                {
+                    $arPrice = $arAllInfo["ELEMENTS"][$arItem["ID"]]["PRICE"];
+
+                    $arBonusPosition = self::calcUnitAndPosition($arPrice, $quantity, $arBonus, $arParams);
+                    $bonus = $arBonusPosition["BONUS_UNIT"];
+                    $bonusAll = $arBonusPosition["BONUS_POSITION"];
+
+                    if($arBonus["VIEW_IN_CATALOG"] == 'N' && $arParams["TYPE"] == 'catalog')
+                        $bonusView = $bonusAllView = 0;
+                    else
+                    {
+                        $bonusView = $bonus;
+                        $bonusAllView = $bonusAll;
+                    }
+
+                    if(isset($arPrice["PRICE_MATRIX"]))
+                    {
+                        $priceMatrix = array();
+                        foreach($arPrice["PRICE_MATRIX"] as $onePrice):
+                            $onePrice["ADD_BONUS"] = round($arBonus["BONUS"] * $onePrice["PRICE"] / 100, $arBonus["ROUND"]);
+                            if($arBonus["VIEW_IN_CATALOG"] == 'N' && $arParams["TYPE"] == 'catalog')
+                                $onePrice["VIEW_BONUS"] = 0;
+                            else
+                                $onePrice["VIEW_BONUS"] = $onePrice["ADD_BONUS"];
+                            $priceMatrix[$onePrice["QUANTITY_HASH"]] = $onePrice;
+                        endforeach;
+                        $arPrice["PRICE_MATRIX"] = $priceMatrix;
+                    }
+                }
+            }
+            $arResult[$arItem["ID"]]["NAME"] = $arAllInfo["ELEMENTS"][$arItem["ID"]]["FIELDS"]["NAME"];
+            $arResult[$arItem["ID"]]["BONUS"] = $arBonus["BONUS"];
+            $arResult[$arItem["ID"]]["ADD_BONUS_UNIT"] = $bonus;
+            $arResult[$arItem["ID"]]["ADD_BONUS"] = $bonusAll;
+            $arResult[$arItem["ID"]]["VIEW_BONUS"] = $bonusView;
+            $arResult[$arItem["ID"]]["BONUS_TYPE"] = $arBonus["BONUS_TYPE"];
+            $arResult[$arItem["ID"]]["PRICE"] = $arPrice;
+            $arResult[$arItem["ID"]]["PROFILE_RULE"] = $arBonus["PROFILE_RULE"];
+            $arResult[$arItem["ID"]]["VIEW_IN_CATALOG"] = $arBonus["VIEW_IN_CATALOG"];
+            $arResult[$arItem["ID"]]["ROUND"] = $arBonus["ROUND"];
+            $arResult[$arItem["ID"]]["ROUND_TYPE"] = $arBonus["ROUND_TYPE"];
+
+        }
+        return $arResult;
+    }
+
+    public static function CheckBonus($arItemId, $arAllInfo, $arProfiles)
+    {
+        $arElementProps = $arAllInfo["ELEMENTS"][$arItemId];
+
+        $arBonus = array("BONUS" => '', "BONUS_TYPE" => '');
+
+        //Perebiraem profili
+        foreach($arProfiles as $arProfile):
+
+            //Perebiraem gruppi usloviy
+            foreach($arProfile["PRODUCT_CONDITIONS"] as $arConditions):
+
+                if($arConditions["controlId"] == 'conditionGroup3')
+                    continue;
+
+                $bonusType = $arConditions["values"]["bonus_type"];
+                $round = $arConditions["values"]["round"];
+                if(isset($arConditions["values"]["round_type"]))
+                    $round_type = $arConditions["values"]["round_type"];
+                else
+                    $round_type = 'UNIT';
+                if(isset($arConditions["values"]["round_method"]))
+                    $round_method = $arConditions["values"]["round_method"];
+                else
+                    $round_method = 'MATH';
+                $globalLogic = $arConditions["values"]["All"];
+                if(isset($arConditions["values"]["bonus"]))
+                    $bonus = (float)$arConditions["values"]["bonus"];
+
+                elseif($arConditions["values"]["bonus_from_props"])
+                {
+                    $bonusProp = $arConditions["values"]["bonus_from_props"];
+                    $bonus = 'N';
+                    $sectId = $arElementProps["FIELDS"]["IBLOCK_SECTION_ID"];
+                    if($arElementProps["OFFER"] == 'Y')
+                    {
+                        $mainProductId = $arElementProps["MAIN_PRODUCT_ID"];
+                        $sectId =  $arAllInfo["ELEMENTS"][$arElementProps["MAIN_PRODUCT_ID"]]["FIELDS"]["IBLOCK_SECTION_ID"];
+                    }
+
+                    if($arElementProps["PROPERTIES"][$bonusProp]["VALUE"] != '')
+                        $bonus = (float)$arElementProps["PROPERTIES"][$bonusProp]["VALUE"];
+
+                    if($arElementProps["OFFER"] == 'Y')
+                    {
+                        if($bonus == 'N' && $arAllInfo["ELEMENTS"][$mainProductId]["PROPERTIES"][$bonusProp]["VALUE"] != '')
+                            $bonus = (float)$arAllInfo["ELEMENTS"][$mainProductId]["PROPERTIES"][$bonusProp]["VALUE"];
+                    }
+
+
+
+                    if($bonus == 'N' && $arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sectId][$bonusProp] != '')
+                        $bonus = (float)$arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sectId][$bonusProp];
+                    if($bonus == 'N' && !empty($arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sectId]["PARENTS"]))
+                    {
+                        foreach($arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sectId]["PARENTS"] as $sId):
+                            if(is_numeric($arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sId][$bonusProp]))
+                                $bonus = $arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sId][$bonusProp];
+                        endforeach;
+                    }
+
+                    if((string)$bonus == 'N')
+                        continue;
+
+                }
+
+                $arDone = array("CONDITIONS_DONE"=>array(), "CONDITIONS_NO_DONE"=>array());
+                $GroupDone = (!empty($arConditions["children"]) ? 'N' : 'Y');
+
+                //Perebiraem usloviya
+                foreach($arConditions["children"] as $arCondition):
+                    $logic = $arCondition["values"]["logic"];
+                    $logicValue = $arCondition["values"]["value"];
+                    $done = 'N';
+                    switch(true)
+                    {
+                        case $arCondition["controlId"] == 'product':
+
+                            if($arElementProps["OFFER"] == 'Y')
+                            {
+                                //$mainProductId = $arElementProps["MAIN_PRODUCT_ID"]
+                                if($logic == 'Equal' && in_array($arElementProps["ID"], $logicValue) ||  $logic == 'Equal' && in_array($arElementProps["MAIN_PRODUCT_ID"], $logicValue))
+                                    $done = 'Y';
+                                if($logic == 'Not' && !in_array($arElementProps["ID"], $logicValue) && $logic == 'Not' && !in_array($arElementProps["MAIN_PRODUCT_ID"], $logicValue))
+                                    $done = 'Y';
+                            }
+                            else
+                            {
+                                if(in_array($arElementProps["ID"], $logicValue) && $logic == 'Equal')
+                                    $done = 'Y';
+                                if(!in_array($arElementProps["ID"], $logicValue) && $logic == 'Not')
+                                    $done = 'Y';
+                            }
+                            break;
+
+                        case $arCondition["controlId"] == 'product_categoty':
+                            if($arElementProps["OFFER"] == 'Y')
+                                $arElementProps["SECTIONS"] = $arAllInfo["ELEMENTS"][$arElementProps["MAIN_PRODUCT_ID"]]["SECTIONS"];
+
+                            if(!empty($arElementProps["SECTIONS"]))
+                            {
+                                if($logic == 'Equal')
+                                {
+                                    foreach($arElementProps["SECTIONS"] as $sectionId):
+                                        if(!isset($arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sectionId]))
+                                            $arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sectionId]["PARENTS"] = [];
+                                        if($sectionId == $logicValue || in_array($logicValue ,$arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sectionId]["PARENTS"]))
+                                            $done = 'Y';
+                                    endforeach;
+                                }
+                                if($logic == 'Not')
+                                {
+                                    $inside = [];
+                                    foreach($arElementProps["SECTIONS"] as $sectionId):
+                                        if(!isset($arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sectionId]))
+                                            $arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sectionId]["PARENTS"] = [];
+
+                                        if(in_array($logicValue, $arElementProps["SECTIONS"]) || in_array($logicValue ,$arAllInfo["SECTIONS"]["SECTIONS_LIST"][$sectionId]["PARENTS"]))
+                                            $inside[] = 'Y';
+                                    endforeach;
+
+                                    if(empty($inside))
+                                        $done = 'Y';
+                                }
+
+                            }
+                            break;
+
+                        case $arCondition["controlId"] == 'iblock':
+                            if(in_array($arElementProps["FIELDS"]["IBLOCK_ID"], $logicValue) && $logic == 'Equal')
+                                $done = 'Y';
+                            if(!in_array($arElementProps["FIELDS"]["IBLOCK_ID"], $logicValue) && $logic == 'Not')
+                                $done = 'Y';
+                            break;
+
+                        case $arCondition["controlId"] == 'price':
+                            if(isset($arElementProps["OFFERS"]))
+                            {
+                                $done = 'A';
+                                continue;
+                            }
+                            $price = $arElementProps["PRICE"]["DISCOUNT_PRICE"];
+                            if($logic == 'Equal' && $logicValue == $price)
+                                $done = 'Y';
+                            if($logic == 'Not' && $logicValue != $price)
+                                $done = 'Y';
+                            if($logic == 'Great' && $price > $logicValue)
+                                $done = 'Y';
+                            if($logic == 'EqGr' && $price >= $logicValue)
+                                $done = 'Y';
+                            if($logic == 'Less' && $price < $logicValue)
+                                $done = 'Y';
+                            if($logic == 'EqLs' && $price <= $logicValue)
+                                $done = 'Y';
+                            break;
+
+                        case $arCondition["controlId"] == 'discount':
+                            $discount = $arElementProps["PRICE"]["DISCOUNT"];
+                            if($logicValue == 'N' && $discount <= 0)
+                                $done = 'Y';
+                            if($logicValue == 'Y' && $discount > 0)
+                                $done = 'Y';
+                            break;
+
+                        case $arCondition["controlId"] == 'discount_size':
+                            if(isset($arElementProps["OFFERS"]))
+                            {
+                                $done = 'A';
+                                continue;
+                            }
+                            $size_type = $arCondition["values"]["type"];
+
+                            if($size_type == 'C')
+                            {
+                                if($arElementProps["PRICE"]["DISCOUNT"] >= 0)
+                                    $discount = $arElementProps["PRICE"]["DISCOUNT"];
+                                else
+                                    $discount = 0;
+                                if($logic == 'Equal' && $logicValue == $discount)
+                                    $done = 'Y';
+                                if($logic == 'Not' && $logicValue != $discount)
+                                    $done = 'Y';
+                                if($logic == 'Great' && $discount > $logicValue)
+                                    $done = 'Y';
+                                if($logic == 'EqGr' && $discount >= $logicValue)
+                                    $done = 'Y';
+                                if($logic == 'Less' && $discount < $logicValue)
+                                    $done = 'Y';
+                                if($logic == 'EqLs' && $discount <= $logicValue)
+                                    $done = 'Y';
+
+                            }
+                            if($size_type == 'P')
+                            {
+                                if($arElementProps["PRICE"]["DISCOUNT"] >= 0)
+                                    $discount = $arElementProps["PRICE"]["DISCOUNT"];
+                                if($arElementProps["PRICE"]["FULL_PRICE"] > 0)
+                                    $discount_percent = $discount * 100 / $arElementProps["PRICE"]["FULL_PRICE"];
+                                else
+                                    $discount_percent = 0;
+
+                                $logicValue = round($logicValue, 2);
+                                $discount_percent = round($discount_percent, 2);
+
+                                if($logic == 'Equal' && $logicValue == $discount_percent)
+                                    $done = 'Y';
+                                if($logic == 'Not' && $logicValue != $discount_percent)
+                                    $done = 'Y';
+                                if($logic == 'Great' && $discount_percent > $logicValue)
+                                    $done = 'Y';
+                                if($logic == 'EqGr' && $discount_percent >= $logicValue)
+                                    $done = 'Y';
+                                if($logic == 'Less' && $discount_percent < $logicValue)
+                                    $done = 'Y';
+                                if($logic == 'EqLs' && $discount_percent <= $logicValue)
+                                    $done = 'Y';
+                            }
+                            break;
+
+                        case $arCondition["controlId"] == 'product_prop_in_cart':
+                            if($arAllInfo["PARAMS"]["TYPE"] = 'cart'):
+                                $checkType = $arCondition["values"]["logic-type"];
+                                $checkTypeValue = $arCondition["values"]["logic-type_value"];
+
+                                //unset($arElementProps['PROPERTIES']);
+                                //echo '<pre>'.$arItemId; print_r($arElementProps); echo '</pre>';
+                                if(isset($arElementProps["BASKET_PROPS"]) && !empty($arElementProps["BASKET_PROPS"])):
+                                    $haveThisProp = 'N';
+                                    foreach($arElementProps["BASKET_PROPS"] as $basketProp):
+                                        //proveryaem svoistvo na primenimost'
+                                        if($checkType == 'name' && $basketProp["NAME"] == $checkTypeValue || $checkType == 'xml_id' && $basketProp["CODE"] == $checkTypeValue)
+                                        {
+                                            $propValue = $basketProp["VALUE"];
+
+                                            if($logic == 'Equal' && $logicValue == $propValue)
+                                                $done = 'Y';
+                                            if($logic == 'Not' && $logicValue != $propValue)
+                                                $done = 'Y';
+                                            if($logic == 'Contain' && strpos($propValue, $logicValue) !== false)
+                                                $done = 'Y';
+                                            if($logic == 'NotCont' && strpos($propValue, $logicValue) === false)
+                                                $done = 'Y';
+
+                                            $haveThisProp = 'Y';
+                                        }
+                                    endforeach;
+                                else:
+                                    $haveThisProp = 'N';
+                                endif;
+
+                                if($haveThisProp == 'N' && $logic == 'Not' || $haveThisProp == 'N' && $logic == 'NotCont')
+                                    $done = 'Y';
+
+                            endif;
+
+                            break;
+
+
+                        case strpos($arCondition["controlId"], 'CondIBProp') !== false:
+                            $arExp = explode(':', $arCondition["controlId"]);
+                            $iblockId = $arExp[1];
+                            $propertyId = $arExp[2];
+                            $arPropFields = $arAllInfo["IBLOCKS_PROPS"][$propertyId];
+                            $propertyCode = $arPropFields["CODE"];
+
+                            if($arElementProps["OFFER"] == 'Y')
+                            {
+                                $mainProductId = $arElementProps["MAIN_PRODUCT_ID"];
+                                $mainElementProps = $arAllInfo["ELEMENTS"][$mainProductId];
+
+                                if($iblockId == $mainElementProps["PROPERTIES"][$propertyCode]["IBLOCK_ID"])
+                                    $arElementProps["PROPERTIES"][$propertyCode] = $mainElementProps["PROPERTIES"][$propertyCode];
+                            }
+
+                            if($iblockId != $arElementProps["PROPERTIES"][$propertyCode]["IBLOCK_ID"])
+                            {
+                                $done = 'A';
+                                continue;
+                            }
+
+
+                            if($arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == '')
+                            {
+
+                                if($arPropFields["MULTIPLE"] == 'N')
+                                {
+
+                                    $elementPropValue = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+
+                                    if($logic == 'Equal' && $logicValue == $elementPropValue)
+                                        $done = 'Y';
+                                    if($logic == 'Not' && $logicValue != $elementPropValue)
+                                        $done = 'Y';
+                                    if($logic == 'Contain' && strpos($elementPropValue, $logicValue) !== false)
+                                        $done = 'Y';
+                                    if($logic == 'NotCont' && strpos($elementPropValue, $logicValue) === false)
+                                        $done = 'Y';
+                                }
+
+                                if($arPropFields["MULTIPLE"] == 'Y')
+                                {
+                                    $elementPropValue = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+                                    if(!is_array($elementPropValue))
+                                        $elementPropValue = [];
+
+                                    if($logic == 'Equal' && in_array($logicValue, $elementPropValue))
+                                        $done = 'Y';
+                                    if($logic == 'Not' && !in_array($logicValue, $elementPropValue))
+                                        $done = 'Y';
+                                    if($logic == 'Contain')
+                                    {
+                                        $fdone = 0;
+                                        foreach($elementPropValue as $val):
+                                            if(strpos($val, $logicValue) !== false)
+                                                $fdone++;
+                                        endforeach;
+                                        if($fdone > 0)
+                                            $done = 'Y';
+                                    }
+                                    if($logic == 'NotCont')
+                                    {
+                                        $fdone = 0;
+                                        foreach($elementPropValue as $val):
+                                            if(strpos($val, $logicValue) !== false)
+                                                $fdone++;
+                                        endforeach;
+                                        if($fdone == 0)
+                                            $done = 'Y';
+                                    }
+                                }
+
+                            }
+
+                            elseif($arPropFields["PROPERTY_TYPE"] == 'N')
+                            {
+                                $elementPropValue = array();
+                                if($arPropFields["MULTIPLE"] == 'N')
+                                    $elementPropValue[] = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+                                if($arPropFields["MULTIPLE"] == 'Y')
+                                    $elementPropValue = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+
+                                $fdone = 0;
+                                foreach($elementPropValue as $val):
+                                    $val =str_replace(',', '.', $val);
+
+                                    if($logic == 'Equal' && $logicValue == $val)
+                                        $fdone++;
+                                    if($logic == 'Not' && $logicValue != $val)
+                                        $fdone++;
+                                    if($logic == 'Great' && $val > $logicValue)
+                                        $fdone++;
+                                    if($logic == 'EqGr' && $val >= $logicValue)
+                                        $fdone++;
+                                    if($logic == 'Less' && $val < $logicValue)
+                                        $fdone++;
+                                    if($logic == 'EqLs' && $val <= $logicValue)
+                                        $fdone++;
+                                endforeach;
+
+                                if($fdone > 0)
+                                    $done = 'Y';
+
+                            }
+                            elseif($arPropFields["PROPERTY_TYPE"] == 'L')
+                            {
+                                $elementPropValue = $arElementProps["PROPERTIES"][$propertyCode]["VALUE_ENUM_ID"];
+
+                                if($arPropFields["MULTIPLE"] == 'N')
+                                {
+                                    if($logic == 'Equal' && $logicValue == $elementPropValue)
+                                        $done = 'Y';
+                                    if($logic == 'Not' && $logicValue != $elementPropValue)
+                                        $done = 'Y';
+                                }
+                                if($arPropFields["MULTIPLE"] == 'Y')
+                                {
+                                    if(!is_array($elementPropValue))
+                                        $elementPropValue = [];
+                                    if($logic == 'Equal' && in_array($logicValue, $elementPropValue))
+                                        $done = 'Y';
+                                    if($logic == 'Not' && !in_array($logicValue, $elementPropValue))
+                                        $done = 'Y';
+                                }
+
+                            }
+                            elseif($arPropFields["PROPERTY_TYPE"] == 'E')
+                            {
+                                $elementPropValue = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+
+                                if($arPropFields["MULTIPLE"] == 'N')
+                                {
+                                    if($logic == 'Equal' && $logicValue == $elementPropValue)
+                                        $done = 'Y';
+                                    if($logic == 'Not' && $logicValue != $elementPropValue)
+                                        $done = 'Y';
+                                }
+                                if($arPropFields["MULTIPLE"] == 'Y')
+                                {
+                                    if(!is_array($elementPropValue))
+                                        $elementPropValue = [];
+                                    if($logic == 'Equal' && in_array($logicValue, $elementPropValue))
+                                        $done = 'Y';
+                                    if($logic == 'Not' && !in_array($logicValue, $elementPropValue))
+                                        $done = 'Y';
+                                }
+
+                            }
+                            elseif($arPropFields["PROPERTY_TYPE"] == 'G')
+                            {
+                                $elementPropValue = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+
+                                if($arPropFields["MULTIPLE"] == 'N')
+                                {
+                                    if($logic == 'Equal' && $logicValue == $elementPropValue)
+                                        $done = 'Y';
+                                    if($logic == 'Not' && $logicValue != $elementPropValue)
+                                        $done = 'Y';
+                                }
+                                if($arPropFields["MULTIPLE"] == 'Y')
+                                {
+                                    if(!is_array($elementPropValue))
+                                        $elementPropValue = [];
+                                    if($logic == 'Equal' && in_array($logicValue, $elementPropValue))
+                                        $done = 'Y';
+                                    if($logic == 'Not' && !in_array($logicValue, $elementPropValue))
+                                        $done = 'Y';
+                                }
+                            }
+
+                            elseif($arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'HTML')
+                            {
+                                $elementPropValue = array();
+                                if($arPropFields["MULTIPLE"] == 'N')
+                                    $elementPropValue[] = $arElementProps["PROPERTIES"][$propertyCode]["~VALUE"];
+                                if($arPropFields["MULTIPLE"] == 'Y')
+                                    $elementPropValue = $arElementProps["PROPERTIES"][$propertyCode]["~VALUE"];
+
+
+                                if($logic == 'Equal')
+                                {
+                                    $fdone == 0;
+                                    foreach($elementPropValue as $val):
+                                        if($logicValue == $val["TEXT"])
+                                            $fdone++;
+                                    endforeach;
+                                    if($fdone > 0)
+                                        $done = 'Y';
+                                }
+                                if($logic == 'Not')
+                                {
+                                    $fdone == 0;
+                                    foreach($elementPropValue as $val):
+                                        if($logicValue != $val["TEXT"])
+                                            $fdone++;
+                                    endforeach;
+                                    if($fdone > 0)
+                                        $done = 'Y';
+                                }
+                                if($logic == 'Contain')
+                                {
+                                    $fdone = 0;
+                                    foreach($elementPropValue as $val):
+                                        if(strpos($val["TEXT"], $logicValue) !== false)
+                                            $fdone++;
+                                    endforeach;
+                                    if($fdone > 0)
+                                        $done = 'Y';
+                                }
+                                if($logic == 'NotCont')
+                                {
+                                    $fdone = 0;
+                                    foreach($elementPropValue as $val):
+                                        if(strpos($val["TEXT"], $logicValue) !== false)
+                                            $fdone++;
+                                    endforeach;
+                                    if($fdone == 0)
+                                        $done = 'Y';
+                                }
+                            }
+
+                            elseif($arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'video')
+                            {
+                                $elementPropValue = array();
+                                if($arPropFields["MULTIPLE"] == 'N')
+                                    $elementPropValue[] = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+                                if($arPropFields["MULTIPLE"] == 'Y')
+                                    $elementPropValue = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+
+                                if($logic == 'Equal')
+                                {
+                                    $fdone == 0;
+                                    foreach($elementPropValue as $val):
+                                        if($logicValue == $val["path"])
+                                            $fdone++;
+                                    endforeach;
+                                    if($fdone > 0)
+                                        $done = 'Y';
+                                }
+                                if($logic == 'Not')
+                                {
+                                    $fdone == 0;
+                                    foreach($elementPropValue as $val):
+                                        if($logicValue != $val["path"])
+                                            $fdone++;
+                                    endforeach;
+                                    if($fdone > 0)
+                                        $done = 'Y';
+                                }
+                                if($logic == 'Contain')
+                                {
+                                    $fdone = 0;
+                                    foreach($elementPropValue as $val):
+                                        if(strpos($val["path"], $logicValue) !== false)
+                                            $fdone++;
+                                    endforeach;
+                                    if($fdone > 0)
+                                        $done = 'Y';
+                                }
+                                if($logic == 'NotCont')
+                                {
+                                    $fdone = 0;
+                                    foreach($elementPropValue as $val):
+                                        if(strpos($val["path"], $logicValue) !== false)
+                                            $fdone++;
+                                    endforeach;
+                                    if($fdone == 0)
+                                        $done = 'Y';
+                                }
+                            }
+                            elseif($arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'Date' || $arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'DateTime')
+                            {
+                                $elementPropValue = array();
+                                if($arPropFields["MULTIPLE"] == 'N')
+                                    $elementPropValue[] = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+                                if($arPropFields["MULTIPLE"] == 'Y')
+                                    $elementPropValue = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+
+                                $fdone = 0;
+                                foreach($elementPropValue as $val):
+                                    $val = \MakeTimeStamp($val, \CSite::GetDateFormat());
+                                    $logicValue = \MakeTimeStamp($logicValue, \CSite::GetDateFormat());
+
+                                    if($logic == 'Equal' && $logicValue == $val)
+                                        $fdone++;
+                                    if($logic == 'Not' && $logicValue != $val)
+                                        $fdone++;
+                                    if($logic == 'Great' && $val > $logicValue)
+                                        $fdone++;
+                                    if($logic == 'EqGr' && $val >= $logicValue)
+                                        $fdone++;
+                                    if($logic == 'Less' && $val < $logicValue)
+                                        $fdone++;
+                                    if($logic == 'EqLs' && $val <= $logicValue)
+                                        $fdone++;
+                                endforeach;
+
+                                if($logic == 'Not')
+                                {
+                                    if($fdone == 0)
+                                        $done = 'Y';
+                                }
+                                else
+                                {
+                                    if($fdone > 0)
+                                        $done = 'Y';
+                                }
+                            }
+
+                            elseif($arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'Money')
+                            {
+                            }
+
+                            elseif(
+                                $arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'map_yandex'
+                                ||
+                                $arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'map_google'
+                                ||
+                                $arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'UserID'
+                                ||
+                                $arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'TopicID'
+                                ||
+                                $arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'FileMan'
+                                ||
+                                $arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'ElementXmlID'
+                                ||
+                                $arPropFields["PROPERTY_TYPE"] == 'S' && $arPropFields["USER_TYPE"] == 'directory'
+                            )
+                            {
+                                $elementPropValue = $arElementProps["PROPERTIES"][$propertyCode]["VALUE"];
+
+                                if($arPropFields["MULTIPLE"] == 'N')
+                                {
+                                    if($logic == 'Equal' && $logicValue == $elementPropValue)
+                                        $done = 'Y';
+                                    if($logic == 'Not' && $logicValue != $elementPropValue)
+                                        $done = 'Y';
+                                    if($logic == 'Contain' && strpos($elementPropValue, $logicValue) !== false)
+                                        $done = 'Y';
+                                    if($logic == 'NotCont' && strpos($elementPropValue, $logicValue) === false)
+                                        $done = 'Y';
+                                }
+
+                                if($arPropFields["MULTIPLE"] == 'Y')
+                                {
+                                    if(!is_array($elementPropValue))
+                                        $elementPropValue = [];
+                                    if($logic == 'Equal' && in_array($logicValue, $elementPropValue))
+                                        $done = 'Y';
+                                    if($logic == 'Not' && !in_array($logicValue, $elementPropValue))
+                                        $done = 'Y';
+                                    if($logic == 'Contain')
+                                    {
+                                        $fdone = 0;
+                                        foreach($elementPropValue as $val):
+                                            if(strpos($val, $logicValue) !== false)
+                                                $fdone++;
+                                        endforeach;
+                                        if($fdone > 0)
+                                            $done = 'Y';
+                                    }
+                                    if($logic == 'NotCont')
+                                    {
+                                        $fdone = 0;
+                                        foreach($elementPropValue as $val):
+                                            if(strpos($val, $logicValue) !== false)
+                                                $fdone++;
+                                        endforeach;
+                                        if($fdone == 0)
+                                            $done = 'Y';
+                                    }
+                                }
+                            }
+
+                            break;
+
+
+
+
+                    }
+                    if($done == 'Y')
+                        $arDone["CONDITIONS_DONE"][] = $arCondition;
+                    elseif($done == 'N')
+                        $arDone["CONDITIONS_NO_DONE"][] = $arCondition;
+                    elseif($done == 'A')
+                        $arDone["CONDITIONS_ALIEN"][] = $arCondition;
+
+                endforeach; //conditions
+
+
+                if($globalLogic == 'AND' && empty($arDone["CONDITIONS_NO_DONE"]))
+                    $GroupDone = 'Y';
+                if($globalLogic == 'OR' && !empty($arDone["CONDITIONS_DONE"]))
+                    $GroupDone = 'Y';
+
+
+                $arRound = array('A'=>0, 'B'=>1, 'C'=>2, 'D'=>3, 'E'=>4);
+                if($GroupDone == 'Y')
+                {
+                    $arBonus["PRODUCT_ID"] = $arItemId;
+                    $arBonus["BONUS"] = $bonus;
+                    $arBonus["BONUS_TYPE"] = $bonusType;
+                    $arBonus["ROUND"] = $arRound[$round];
+                    $arBonus["ROUND_TYPE"] = $round_type;
+                    $arBonus["ROUND_METHOD"] = $round_method;
+                    $arBonus["VIEW_IN_CATALOG"] = $arProfile["VIEW_IN_CATALOG"];
+                    $arBonus["PROFILE_RULE"] = array("PROFILE" => $arProfile["id"], "PROFILE_TYPE" => $arProfile['type'], "GROUP" => $arConditions["id"]);
+
+                    $arBonus["PROFILES"][$arProfile["id"]] = array("ID" => $arProfile["id"], "VIEW_IN_CATALOG" => $arProfile["VIEW_IN_CATALOG"], "SORT" => $arProfile["sort"], "active_after_period" => $arProfile["active_after_period"], "active_after_type" => $arProfile["active_after_type"], "deactive_after_period" => $arProfile["deactive_after_period"], "deactive_after_period" => $arProfile["deactive_after_period"]);
+                    //$arBonus["PROFILES"][$arProfile["id"]]["CONDITIONS"] = $arDone;
+                }
+
+            endforeach; //groups
+
+        endforeach; //profiles
+
+        /* SOBITIE POSLE PROVERKI USLOVIYA */
+        $eventAfterCheck = $arBonus;
+        $eventAfterCheck['PARAMS'] = $arAllInfo['PARAMS'];
+        $eventAfterCheck['ELEMENT_INFO'] = $arAllInfo['ELEMENTS'][$arItemId];
+        $event = new \Bitrix\Main\Event("logictim.balls", "BeforeCalculateBonus", $eventAfterCheck);
+        $event->send();
+        if($event->getResults())
+        {
+            foreach($event->getResults() as $eventResult):
+                $arBonusCustom = $eventResult->getParameters();
+                $arBonus['BONUS'] = $arBonusCustom['BONUS'];
+                $arBonus['BONUS_TYPE'] = $arBonusCustom['BONUS_TYPE'];
+                $arBonus['ROUND'] = $arBonusCustom['ROUND'];
+                $arBonus['ROUND_TYPE'] = $arBonusCustom['ROUND_TYPE'];
+                $arBonus['ROUND_METHOD'] = $arBonusCustom['ROUND_METHOD'];
+                $arBonus['VIEW_IN_CATALOG'] = $arBonusCustom['VIEW_IN_CATALOG'];
+            endforeach;
+        }
+        /* SOBITIE POSLE PROVERKI USLOVIYA */
+
+        return $arBonus;
+    }
 
     public static function OrderBonusPayment($arItems, $arOrderParams)
     {

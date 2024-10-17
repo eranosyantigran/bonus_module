@@ -5,7 +5,7 @@ BX.ready(function(){
 function updateBonusField() {
     if(document.getElementById('paybonus_input').value == '0')
         document.getElementById('paybonus_input').value = '00';
-    BX.Sale.OrderAjaxComponent.sendRequest();
+    // BX.Sale.OrderAjaxComponent.sendRequest();
 }
 
 function useBonus()
@@ -13,6 +13,7 @@ function useBonus()
     BX('paybonus_input_hidden').value = BX('paybonus_input').value;
     updateBonusField();
 }
+
 
 BX.addCustomEvent('onAjaxSuccess', function() {itbLogicBonusOrder('ajax');});
 
@@ -167,6 +168,34 @@ function itbLogicBonusOrder(type) {
     }
     else {
         BX.remove(BX('bonus_payment_block'));
+    }
+
+    if(parseFloat(result.USER_BONUS) > 0 && parseFloat(result.MIN_BONUS) > parseFloat(result.USER_BONUS) || parseFloat(result.USER_BONUS) > 0 && parseFloat(result.MIN_BONUS) > parseFloat(result.MAX_BONUS))
+    {
+        var payment_block = BX.create('DIV', {props: {id: 'bonus_payment_block', className: 'bx-soa-section'}});
+        var payment_title = BX.create('DIV', {attrs: {className: 'bx-soa-section-title-container'},
+            html: '<h2 class="bx-soa-section-title col-sm-9"><span class="bx-soa-section-title-count"></span>'+result.MODULE_LANG.TEXT_BONUS_FOR_PAYMENT+'</h2>'
+        });
+        payment_block.appendChild(payment_title);
+        var payment_block_content = BX.create('DIV', {props: {className: 'bx-soa-section-content lt_bonus_cont_error'}});
+        payment_block.appendChild(payment_block_content);
+
+        var comment_block = BX.create('DIV', {
+            props: {className: 'bonus_comment'},
+            children: [
+                BX.create('strong', {html: result.MODULE_LANG.HAVE_BONUS_TEXT_FORMAT})
+            ]
+        });
+
+        if(parseFloat(result.MIN_BONUS) > parseFloat(result.MAX_BONUS))
+            result.MODULE_LANG.TEXT_BONUS_ERROR_MIN_BONUS_FORMAT =  result.MODULE_LANG.TEXT_BONUS_ERROR_MIN_BONUS_FORMAT + ' ' +  result.MODULE_LANG.MAX_BONUS_TEXT;
+        comment_block.appendChild(BX.create('span', {html: result.MODULE_LANG.TEXT_BONUS_ERROR_MIN_BONUS_FORMAT}));
+        payment_block_content.appendChild(comment_block);
+
+        BX.remove(BX('bonus_payment_block'));
+        var last_block = document.querySelectorAll('.bx-soa-section.bx-active');
+        last_block = last_block[last_block.length -1];
+        BX.insertAfter(payment_block, last_block);
     }
 
     if(logictimPayBonus > 0 && result.DISCOUNT_TO_PRODUCTS != 'B') {

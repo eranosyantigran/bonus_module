@@ -53,9 +53,14 @@ Class Bonus_Itb extends CModule
         //Добавление платёжной системой
         include(dirname(__FILE__)."/include/paysystem_install.php");
 
+        include($_SERVER['DOCUMENT_ROOT'].'/local/modules/bonus_itb/options.php');
+
         CopyDirFiles(dirname(__FILE__)."/admin", $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin", true, true);
+        CopyDirFiles(dirname(__FILE__)."/js", $_SERVER["DOCUMENT_ROOT"]."/bitrix/js/bonus_itb/", true, true);
 
         RegisterModuleDependences("sale","OnSaleOrderPaid","bonus_itb","SaleOrderPaid","SaleOrderPaidAddBonus");
+        RegisterModuleDependences("sale","OnSaleComponentOrderResultPrepared","bonus_itb","\Itb\Bonus\Event\OrderResultPrepared","OnSaleComponentOrderResultPrepared");
+        RegisterModuleDependences("sale","OnSaleOrderBeforeSaved","bonus_itb","\Itb\Bonus\Event\OnSaleOrderSaved","OnSaleOrderBeforeSaved");
 
         ModuleManager::RegisterModule($this->MODULE_ID);
 
@@ -71,6 +76,8 @@ Class Bonus_Itb extends CModule
         include(dirname(__FILE__)."/include/delete_order_props.php");
         include(dirname(__FILE__)."/include/del_paysystem.php");
         DeleteDirFiles(dirname(__FILE__)."/admin", $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin");
+
+        DeleteDirFilesEx("/bitrix/js/bonus_itb");
 
         UnRegisterModuleDependences("sale","OnSaleOrderPaid","bonus_itb","SaleOrderPaid","SaleOrderPaidAddBonus");
 

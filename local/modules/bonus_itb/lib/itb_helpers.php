@@ -30,6 +30,17 @@ class ItbHelpers
         return $arCatalogs;
     }
 
+    public static function FormatBonusString($string, $search, $var)
+    {
+        if(strpos($string, $search) !== false) {
+            $newString = str_replace($search, (string)$var, $string);
+        }
+        else
+            $newString = $string. ' '.$var;
+
+        return $newString;
+    }
+
     public static function GetUserGroups()
     {
         $userGrups = array();

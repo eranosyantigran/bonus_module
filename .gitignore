@@ -54,7 +54,7 @@ ehthumbs.db
 *.gz*
 *.tgz
 *.tgz*
-*.sql
+#*.sql
 *.rar
 .hg
 .ftpconfig

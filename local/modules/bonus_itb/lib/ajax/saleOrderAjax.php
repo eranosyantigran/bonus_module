@@ -2,9 +2,13 @@
 
 namespace ITB\Bonus\Ajax;
 
+use Bitrix\Sale\PriceMaths;
+use Bitrix\Sale\Discount;
+use Bitrix\Sale\DiscountBase;
+use Bitrix\Sale\DiscountCouponsManager;
 \Bitrix\Main\Loader::includeModule("bonus_itb");
 
-class OrderAjax {
+class SaleOrderAjax {
 
     public static function OrderAjaxResultPrepared($order, &$arUserResult, $request, &$arParams, &$arResult){
 
@@ -178,7 +182,7 @@ class OrderAjax {
                     endforeach;
                 endif;
 
-                $arResult["JS_DATA"]["LOGICTIM_BONUS"]["ARR_PAY_BONUS"]["ITEMS"] = $arItems;
+                $arResult["JS_DATA"]["ITB_BONUS"]["ARR_PAY_BONUS"]["ITEMS"] = $arItems;
 
 
                 //New basket and order sum
@@ -271,97 +275,97 @@ class OrderAjax {
 
 
         $UserBonusSystemDostup = 'Y';
-        $arResult["MIN_BONUS"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["MIN_BONUS"] = $minBonusSum;
-        $arResult["MAX_BONUS"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["MAX_BONUS"] = $maxBonusSum;
-        $arResult["USER_BONUS"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["USER_BONUS"] = $UserBallance;
-        $arResult["LOGICTIM_BONUS_USER_DOSTUP"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["LOGICTIM_BONUS_USER_DOSTUP"] = $UserBonusSystemDostup;
+        $arResult["MIN_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["MIN_BONUS"] = $minBonusSum;
+        $arResult["MAX_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["MAX_BONUS"] = $maxBonusSum;
+        $arResult["USER_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["USER_BONUS"] = $UserBallance;
+        $arResult["ITB_BONUS_USER_DOSTUP"] = $arResult["JS_DATA"]["ITB_BONUS"]["ITB_BONUS_USER_DOSTUP"] = $UserBonusSystemDostup;
 
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["INPUT_BONUS"] = $input_bonus;
-        $arResult["PAY_BONUS"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["PAY_BONUS"] = $pay_bonus;
-        $arResult["PAY_BONUS_FORMATED"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["PAY_BONUS_FORMATED"] = \SaleFormatCurrency($pay_bonus, $arOrderParams['CURRENCY']);
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["PAY_BONUS_NO_POST"] = $pay_bonus; //OLD
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["PAY_BONUS_NO_POST_FORMATED"] = SaleFormatCurrency($pay_bonus, $arOrderParams['CURRENCY']); //OLD
+        $arResult["JS_DATA"]["ITB_BONUS"]["INPUT_BONUS"] = $input_bonus;
+        $arResult["PAY_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["PAY_BONUS"] = $pay_bonus;
+        $arResult["PAY_BONUS_FORMATED"] = $arResult["JS_DATA"]["ITB_BONUS"]["PAY_BONUS_FORMATED"] = \SaleFormatCurrency($pay_bonus, $arOrderParams['CURRENCY']);
+        $arResult["JS_DATA"]["ITB_BONUS"]["PAY_BONUS_NO_POST"] = $pay_bonus; //OLD
+        $arResult["JS_DATA"]["ITB_BONUS"]["PAY_BONUS_NO_POST_FORMATED"] = SaleFormatCurrency($pay_bonus, $arOrderParams['CURRENCY']); //OLD
 
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["ORDER_SUM"] = $arOrderParams["ORDER_SUM"];
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["ORDER_SUM_FORMATED"] = SaleFormatCurrency($arOrderParams["ORDER_SUM"], $arOrderParams['CURRENCY']);
+        $arResult["JS_DATA"]["ITB_BONUS"]["ORDER_SUM"] = $arOrderParams["ORDER_SUM"];
+        $arResult["JS_DATA"]["ITB_BONUS"]["ORDER_SUM_FORMATED"] = SaleFormatCurrency($arOrderParams["ORDER_SUM"], $arOrderParams['CURRENCY']);
 
-        $arResult["ARR_BONUS"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["ARR_BONUS"] = $arBonus;
-        $arResult["ADD_BONUS"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["ADD_BONUS"] = (string)$arBonus["ALL_BONUS"];
+        $arResult["ARR_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["ARR_BONUS"] = $arBonus;
+        $arResult["ADD_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["ADD_BONUS"] = (string)$arBonus["ALL_BONUS"];
 
-        $formatAll = \COption::GetOptionString("logictim.balls", "TEMPLATE_BONUS_FOR_ORDER".$langSufix, '');
+        $formatAll = \COption::GetOptionString("bonus_itb", "TEMPLATE_BONUS_FOR_ORDER".$langSufix, '');
         if(!$formatAll || $formatAll == '')
             $formatAll = '#BONUS#';
-        $arResult["ADD_BONUS_FORMAT"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["ADD_BONUS_FORMAT"] = str_replace('#BONUS#', (string)$arBonus["ALL_BONUS"], $formatAll);
+        $arResult["ADD_BONUS_FORMAT"] = $arResult["JS_DATA"]["ITB_BONUS"]["ADD_BONUS_FORMAT"] = str_replace('#BONUS#', (string)$arBonus["ALL_BONUS"], $formatAll);
 
 
-        $arResult["ORDER_PROP_PAYMENT_BONUS_ID"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["ORDER_PROP_PAYMENT_BONUS_ID"] = $payment_prop_id;
-        $arResult["ORDER_PROP_ADD_BONUS_ID"] = $arResult["JS_DATA"]["LOGICTIM_BONUS"]["ORDER_PROP_ADD_BONUS_ID"] = $addBpnus_prop_id;
+        $arResult["ORDER_PROP_PAYMENT_BONUS_ID"] = $arResult["JS_DATA"]["ITB_BONUS"]["ORDER_PROP_PAYMENT_BONUS_ID"] = $payment_prop_id;
+        $arResult["ORDER_PROP_ADD_BONUS_ID"] = $arResult["JS_DATA"]["ITB_BONUS"]["ORDER_PROP_ADD_BONUS_ID"] = $addBpnus_prop_id;
 
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["DISCOUNT_TO_PRODUCTS"] = \COption::GetOptionString("logictim.balls", "DISCOUNT_TO_PRODUCTS", 'N');
+        $arResult["JS_DATA"]["ITB_BONUS"]["DISCOUNT_TO_PRODUCTS"] = \COption::GetOptionString("bonus_itb", "DISCOUNT_TO_PRODUCTS", 'N');
 
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["ORDER_PAY_BONUS_AUTO"] = \COption::GetOptionString("logictim.balls", "ORDER_PAY_BONUS_AUTO", 'Y');
+        $arResult["JS_DATA"]["ITB_BONUS"]["ORDER_PAY_BONUS_AUTO"] = \COption::GetOptionString("bonus_itb", "ORDER_PAY_BONUS_AUTO", 'Y');
 
         //ADD_TEXT
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["TEXT_BONUS_BALLS"] = \COption::GetOptionString("logictim.balls", "TEXT_BONUS_BALLS".$langSufix, 'bonus:');
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["TEXT_BONUS_PAY"] = \COption::GetOptionString("logictim.balls", "TEXT_BONUS_PAY".$langSufix, 'pay from bonus:');
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["TEXT_BONUS_FOR_ITEM"] = \COption::GetOptionString("logictim.balls", "TEXT_BONUS_FOR_ITEM".$langSufix, 'pay from bonus:');
+        $arResult["JS_DATA"]["ITB_BONUS"]["TEXT_BONUS_BALLS"] = \COption::GetOptionString("bonus_itb", "TEXT_BONUS_BALLS".$langSufix, 'bonus:');
+        $arResult["JS_DATA"]["ITB_BONUS"]["TEXT_BONUS_PAY"] = \COption::GetOptionString("bonus_itb", "TEXT_BONUS_PAY".$langSufix, 'pay from bonus:');
+        $arResult["JS_DATA"]["ITB_BONUS"]["TEXT_BONUS_FOR_ITEM"] = \COption::GetOptionString("bonus_itb", "TEXT_BONUS_FOR_ITEM".$langSufix, 'pay from bonus:');
 
         $payCooment = '';
-        if(strpos(\COption::GetOptionString("logictim.balls", "MIN_BONUS_TEXT".$langSufix, ''), '#BONUS#') !== false || strpos(\COption::GetOptionString("logictim.balls", "MAX_BONUS_TEXT".$langSufix, ''), '#BONUS#') !== false)
+        if(strpos(\COption::GetOptionString("bonus_itb", "MIN_BONUS_TEXT".$langSufix, ''), '#BONUS#') !== false || strpos(\COption::GetOptionString("bonus_itb", "MAX_BONUS_TEXT".$langSufix, ''), '#BONUS#') !== false)
         {
-            $payCooment .= \COption::GetOptionString("logictim.balls", "CAN_BONUS_TEXT".$langSufix, 'Can use bonus');
+            $payCooment .= \COption::GetOptionString("bonus_itb", "CAN_BONUS_TEXT".$langSufix, 'Can use bonus');
             if($minBonusSum > 0)
-                $payCooment .= ' '.\Logictim\Balls\Helpers::FormatBonusString(\COption::GetOptionString("logictim.balls", "MIN_BONUS_TEXT".$langSufix, 'Min use bonus'), '#BONUS#', $minBonusSum);
+                $payCooment .= ' '.\Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MIN_BONUS_TEXT".$langSufix, 'Min use bonus'), '#BONUS#', $minBonusSum);
             if($maxBonusSum > 0 && $maxBonusSum >= $minBonusSum)
-                $payCooment .= ' '.\Logictim\Balls\Helpers::FormatBonusString(\COption::GetOptionString("logictim.balls", "MAX_BONUS_TEXT".$langSufix, 'Max use bonus'), '#BONUS#', $maxBonusSum);
+                $payCooment .= ' '.\Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MAX_BONUS_TEXT".$langSufix, 'Max use bonus'), '#BONUS#', $maxBonusSum);
         }
         else
         {
             if($minBonusSum > 0)
-                $payCooment .= '<span>'.\Logictim\Balls\Helpers::FormatBonusString(\COption::GetOptionString("logictim.balls", "MIN_BONUS_TEXT".$langSufix, 'Min use bonus'), '#BONUS#', $minBonusSum).'</span>';
+                $payCooment .= '<span>'.\Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MIN_BONUS_TEXT".$langSufix, 'Min use bonus'), '#BONUS#', $minBonusSum).'</span>';
             if($maxBonusSum > 0 && $maxBonusSum >= $minBonusSum)
-                $payCooment .= '<span>'.\Logictim\Balls\Helpers::FormatBonusString(\COption::GetOptionString("logictim.balls", "MAX_BONUS_TEXT".$langSufix, 'Max use bonus'), '#BONUS#', $maxBonusSum).'</span>';
+                $payCooment .= '<span>'.\Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MAX_BONUS_TEXT".$langSufix, 'Max use bonus'), '#BONUS#', $maxBonusSum).'</span>';
         }
         $errorMinBonusComment = '';
-        if(\COption::GetOptionString("logictim.balls", "TEXT_BONUS_ERROR_MIN_BONUS".$langSufix, '') != '')
+        if(\COption::GetOptionString("bonus_itb", "TEXT_BONUS_ERROR_MIN_BONUS".$langSufix, '') != '')
         {
-            if(strpos(\COption::GetOptionString("logictim.balls", "TEXT_BONUS_ERROR_MIN_BONUS".$langSufix, ''), '#BONUS#') !== false)
-                $errorMinBonusComment .= \Logictim\Balls\Helpers::FormatBonusString(\COption::GetOptionString("logictim.balls", "TEXT_BONUS_ERROR_MIN_BONUS".$langSufix, ''), '#BONUS#', $minBonusSum);
+            if(strpos(\COption::GetOptionString("bonus_itb", "TEXT_BONUS_ERROR_MIN_BONUS".$langSufix, ''), '#BONUS#') !== false)
+                $errorMinBonusComment .= \Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "TEXT_BONUS_ERROR_MIN_BONUS".$langSufix, ''), '#BONUS#', $minBonusSum);
         }
         else
             $errorMinBonusComment .= $payCooment;
 
-        $paymentComment = \COption::GetOptionString("logictim.balls", "TEXT_BONUS_PAYMENT_COMMENT".$langSufix, '');
-        if(\COption::GetOptionString("logictim.balls", "TEXT_BONUS_PAYMENT_COMMENT".$langSufix, '') != '')
+        $paymentComment = \COption::GetOptionString("bonus_itb", "TEXT_BONUS_PAYMENT_COMMENT".$langSufix, '');
+        if(\COption::GetOptionString("bonus_itb", "TEXT_BONUS_PAYMENT_COMMENT".$langSufix, '') != '')
         {
-            if(strpos(\COption::GetOptionString("logictim.balls", "TEXT_BONUS_PAYMENT_COMMENT".$langSufix, ''), '#BONUS#') !== false)
-                $paymentComment = str_replace('#BONUS#', $arResult["PAY_BONUS"], \COption::GetOptionString("logictim.balls", "TEXT_BONUS_PAYMENT_COMMENT".$langSufix, ''));
+            if(strpos(\COption::GetOptionString("bonus_itb", "TEXT_BONUS_PAYMENT_COMMENT".$langSufix, ''), '#BONUS#') !== false)
+                $paymentComment = str_replace('#BONUS#', $arResult["PAY_BONUS"], \COption::GetOptionString("bonus_itb", "TEXT_BONUS_PAYMENT_COMMENT".$langSufix, ''));
         }
 
-        $maxBonusText = \COption::GetOptionString("logictim.balls", "MAX_BONUS_TEXT".$langSufix, '');
+        $maxBonusText = \COption::GetOptionString("bonus_itb", "MAX_BONUS_TEXT".$langSufix, '');
         if($maxBonusText != '')
         {
             if(strpos($maxBonusText, '#BONUS#') !== false)
                 $maxBonusText = str_replace('#BONUS#', $arResult["MAX_BONUS"], $maxBonusText);
         }
-        $minBonusText = \COption::GetOptionString("logictim.balls", "MIN_BONUS_TEXT".$langSufix, '');
+        $minBonusText = \COption::GetOptionString("bonus_itb", "MIN_BONUS_TEXT".$langSufix, '');
         if($minBonusText != '')
         {
             if(strpos($minBonusText, '#BONUS#') !== false)
                 $minBonusText = str_replace('#BONUS#', $arResult["MIN_BONUS"], $minBonusText);
         }
 
-        $arResult["JS_DATA"]["LOGICTIM_BONUS"]["MODULE_LANG"] = array(
-            "HAVE_BONUS_TEXT" => \COption::GetOptionString("logictim.balls", "HAVE_BONUS_TEXT".$langSufix, 'Have bonus'),
-            "HAVE_BONUS_TEXT_FORMAT" => \Logictim\Balls\Helpers::FormatBonusString(\COption::GetOptionString("logictim.balls", "HAVE_BONUS_TEXT".$langSufix, 'Have bonus'), '#BONUS#', $UserBallance),
-            "CAN_USE_BONUS_TEXT" => \COption::GetOptionString("logictim.balls", "CAN_BONUS_TEXT".$langSufix, 'Can use bonus'),
+        $arResult["JS_DATA"]["ITB_BONUS"]["MODULE_LANG"] = array(
+            "HAVE_BONUS_TEXT" => \COption::GetOptionString("bonus_itb", "HAVE_BONUS_TEXT".$langSufix, 'Have bonus'),
+            "HAVE_BONUS_TEXT_FORMAT" => \Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "HAVE_BONUS_TEXT".$langSufix, 'Have bonus'), '#BONUS#', $UserBallance),
+            "CAN_USE_BONUS_TEXT" => \COption::GetOptionString("bonus_itb", "CAN_BONUS_TEXT".$langSufix, 'Can use bonus'),
             "CAN_USE_BONUS_TEXT_FORMAT" => $payCooment,
             "MIN_BONUS_TEXT" => $minBonusText,
             "MAX_BONUS_TEXT" => $maxBonusText,
-            "PAY_BONUS_TEXT" => \COption::GetOptionString("logictim.balls", "PAY_BONUS_TEXT".$langSufix, 'Pay from bonus'),
-            "TEXT_BONUS_FOR_PAYMENT" => \COption::GetOptionString("logictim.balls", "TEXT_BONUS_FOR_PAYMENT".$langSufix, 'Pay from bonus'),
-            "TEXT_BONUS_FOR_PAYMENT" => \COption::GetOptionString("logictim.balls", "TEXT_BONUS_FOR_PAYMENT".$langSufix, 'Pay from bonus'),
-            "TEXT_BONUS_USE_BONUS_BUTTON" => \COption::GetOptionString("logictim.balls", "TEXT_BONUS_USE_BONUS_BUTTON".$langSufix, 'Use'),
+            "PAY_BONUS_TEXT" => \COption::GetOptionString("bonus_itb", "PAY_BONUS_TEXT".$langSufix, 'Pay from bonus'),
+            "TEXT_BONUS_FOR_PAYMENT" => \COption::GetOptionString("bonus_itb", "TEXT_BONUS_FOR_PAYMENT".$langSufix, 'Pay from bonus'),
+            "TEXT_BONUS_FOR_PAYMENT" => \COption::GetOptionString("bonus_itb", "TEXT_BONUS_FOR_PAYMENT".$langSufix, 'Pay from bonus'),
+            "TEXT_BONUS_USE_BONUS_BUTTON" => \COption::GetOptionString("bonus_itb", "TEXT_BONUS_USE_BONUS_BUTTON".$langSufix, 'Use'),
             "TEXT_BONUS_ERROR_MIN_BONUS_FORMAT" => $errorMinBonusComment,
             "TEXT_BONUS_PAYMENT_COMMENT" => $paymentComment,
         );
@@ -380,10 +384,10 @@ class OrderAjax {
         $arResult["PAY_SYSTEM"] = array_values($arResult["PAY_SYSTEM"]);
 
         global $APPLICATION;
-        if(\COption::GetOptionString("logictim.balls", "INTEGRATE_IN_SALE_ORDER_AJAX", 'N') == 'Y')
+        if(\COption::GetOptionString("bonus_itb", "INTEGRATE_IN_SALE_ORDER_AJAX", 'N') == 'Y')
         {
-            $APPLICATION->AddHeadScript('/bitrix/js/logictim.balls/sale_order_ajax.js');
-            $APPLICATION->SetAdditionalCSS("/bitrix/js/logictim.balls/sale_order_ajax.css");
+            $APPLICATION->AddHeadScript('/bitrix/js/bonus_itb/sale_order_ajax.js');
+            $APPLICATION->SetAdditionalCSS("/bitrix/js/bonus_itb/sale_order_ajax.css");
             //CJSCore::Init(array("jquery2"));
         }
 
@@ -391,6 +395,55 @@ class OrderAjax {
     }
 
 
+    public static function saleOrderSaved($order){
+
+        global $USER;
+
+        $user = new \CUser;
+        $inofOrder = $order->toArray();
+        $paymentCollection = $order->getPaymentCollection();
+        $propertyCollection = $order->getPropertyCollection();
+        $paysystemName = $paymentCollection->toArray()[0]['PAY_SYSTEM_NAME'];
+        $paysystemId = $paymentCollection->getOrder()->getFields()->getValues()['PAY_SYSTEM_ID'];
+        $payAllSum = $paymentCollection->getOrder()->getFields()->getValues()['PRICE'];
+        $bonus_val = 0;
+        $properties = $propertyCollection->getArray()['properties'];
+
+        if($USER->IsAuthorized())
+            $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance($inofOrder["USER_ID"]);
+        else
+            $UserBallance = 0;
+
+        foreach ($properties as $prop){
+            if ($prop['CODE'] == 'ITB_PAYMENT_BONUS'){
+                $bonus_val =  $prop['VALUE'][0];
+            }
+        }
+
+        if ($paysystemName == 'Бонусный счет'){
+
+            if ($inofOrder['PRICE'] < (int)$bonus_val && $UserBallance > 0 ){
+
+                $bonus_after = (int)$bonus_val - $inofOrder['PRICE'];
+
+                $newBalance = $UserBallance - $inofOrder['PRICE'] + $bonus_after;
+
+                $fields = [
+                    "UF_BONUS_COUNT" => $newBalance,
+                ];
+
+                if ($order->getId() === 0) {
+                    $result = $user->Update($inofOrder["USER_ID"], $fields);
+                    if ($paymentCollection->count() > 0) {
+                        foreach ($paymentCollection as $payment) {
+                            $payment->setField('PAID', 'Y');
+                        }
+                    }
+                }
+
+            }
+        }
+    }
 
 
 }
