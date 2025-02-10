@@ -5,7 +5,7 @@ BX.ready(function(){
 function updateBonusField() {
     if(document.getElementById('paybonus_input').value == '0')
         document.getElementById('paybonus_input').value = '00';
-    // BX.Sale.OrderAjaxComponent.sendRequest();
+    BX.Sale.OrderAjaxComponent.sendRequest();
 }
 
 function useBonus()
@@ -134,7 +134,7 @@ function itbLogicBonusOrder(type) {
                 attrs: {
                     type: 'text',
                     id: 'paybonus_input',
-                    //onchange: 'useBonus();',
+                    onchange: 'useBonus();',
                     className: 'form-control bx-ios-fix',
                     value: logictimPayBonusField,
                 },

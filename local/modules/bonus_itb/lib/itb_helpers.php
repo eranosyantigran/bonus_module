@@ -156,4 +156,16 @@ class ItbHelpers
         return $userBonus;
     }
 
+
+    public static function PaySystemBonusId()
+    {
+        \CModule::IncludeModule("sale");
+        $paySystemBonus = \CSalePaySystem::GetList(array(), array('CODE' => 'ITB_PAYMENT_BONUS'));
+        while($ptype = $paySystemBonus->Fetch())
+        {
+            $paySystemId = $ptype["ID"];
+        }
+
+        return $paySystemId;
+    }
 }

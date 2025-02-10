@@ -17,37 +17,40 @@ class BonusOrder
 
     public static function onOrderSave($order)
     {
-
+        $is_new = $order->isNew();
         $fields = $order->GetFields();
         $values = $fields->GetValues();
 
-        $total_sum = $values['SUM_PAID'];
         $order_id = $values['ID'];
-        $user_id = $values['USER_ID'];
 
+        if (!$is_new):
 
-        if($values['PAYED'] == "Y"){
+            if($values['PAYED'] == "Y"){
 
-            $rs =  BonusEventTable::getList([
-                "filter" => ['ACTIVE' => "Y", "TYPE" => 'order'],
-            ])->Fetch();
+                $rs =  BonusAddTable::getList([
+                    "filter" => ["TYPE" => 'order' , 'ORDER_ID' => $order_id , 'OPERATION_TYPE' => 'PAYED_N'],
+                ])->Fetch();
 
-            $arrCondition = unserialize($rs['CONDITIONS']);
+                if ($rs['USER'] > 0):
+                    $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance($rs['USER']);
+                    $user_id = $rs['USER'];
+                else:
+                    $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance(1);
+                    $user_id = 1;
+                endif;
 
-            $condition = self::GetConditionArray('order', $arrCondition, $values);
+                $newBalance = $UserBallance + $rs['BONUS_PRICE'];
 
-            if (!empty($condition) && count($condition) >= 1){
+                $user = new \CUser;
 
-                $arrbonususer = ['USER' => $user_id , "ORDER_ID" => $order_id, "TYPE" => $rs['TYPE'], "BONUS_ID" => $rs['ID'], "BONUS_PRICE" => $condition['BONUS_PRICE'] ];
+                $fields = [
+                    "UF_BONUS_COUNT" => $newBalance,
+                ];
 
-                self::AddBonusFromUser($user_id, $arrbonususer , $condition);
-
+                $result = $user->Update($user_id, $fields);
             }
 
-        }else{
-
-            self::MinusBonusUser($user_id, $order_id);
-        }
+        endif;
 
     }
 
@@ -152,37 +155,20 @@ class BonusOrder
         return false;
     }
 
-    public static function MinusBonusUser($userId, $order_id){
-
-        $resl =  BonusAddTable::getList([
-            "filter" => ["ORDER_ID" => $order_id],
-        ])->Fetch();
-
-        if (!empty($resl)){
+    public static function MinusBonusUser($arFields){
 
             $user = new \CUser;
 
-            $userData = UserTable::getList([
-                'select' => ['UF_*'], // 'UF_*' выбирает все пользовательские поля
-                'filter' => ['ID' => $userId],
-            ])->fetch();
-
-
-
-            if ($userData['UF_BONUS_COUNT'] > $resl['BONUS_PRICE'])
-                $bonus = $userData['UF_BONUS_COUNT'] - $resl['BONUS_PRICE'] ;
-            else
-                $bonus = $resl['BONUS_PRICE'] - $userData['UF_BONUS_COUNT']  ;
-
             $fields = [
-                "UF_BONUS_COUNT" => $bonus,
+                "UF_BONUS_COUNT" => $arFields['AFTER_PRICE_BONUS'],
             ];
 
-            $result = $user->Update($userId, $fields);
+            $result = $user->Update($arFields['USER_ID'], $fields);
 
-            BonusAddTable::update($resl['ID'], ["BONUS_PRICE" => 0]);
+            if ($result){
+                return true;
+            }
 
-        }
     }
 
 }

@@ -9,10 +9,14 @@ class OnSaleOrderSaved {
 
 	public static function OnSaleOrderBeforeSaved($event)
 	{
-
-
-			\ITB\Bonus\Ajax\SaleOrderAjax::saleOrderSaved($event);
+			\ITB\Bonus\Ajax\SaleOrderAjax::saleOrderBeforeSaved($event);
 	}
+
+	public static function OrderAfterSaved($event)
+	{
+			\ITB\Bonus\Ajax\SaleOrderAjax::saleOrderAfterSaved($event);
+	}
+
 }
 
 ?>

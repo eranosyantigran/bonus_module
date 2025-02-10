@@ -61,7 +61,7 @@ Class Bonus_Itb extends CModule
         RegisterModuleDependences("sale","OnSaleOrderPaid","bonus_itb","SaleOrderPaid","SaleOrderPaidAddBonus");
         RegisterModuleDependences("sale","OnSaleComponentOrderResultPrepared","bonus_itb","\Itb\Bonus\Event\OrderResultPrepared","OnSaleComponentOrderResultPrepared");
         RegisterModuleDependences("sale","OnSaleOrderBeforeSaved","bonus_itb","\Itb\Bonus\Event\OnSaleOrderSaved","OnSaleOrderBeforeSaved");
-
+        RegisterModuleDependences("sale","OnSaleOrderSaved","bonus_itb","\Itb\Bonus\Event\OnSaleOrderSaved","OrderAfterSaved", 1);
         ModuleManager::RegisterModule($this->MODULE_ID);
 
         return true;

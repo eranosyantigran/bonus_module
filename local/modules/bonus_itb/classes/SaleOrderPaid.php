@@ -9,8 +9,6 @@ class SaleOrderPaid
 {
     public static function SaleOrderPaidAddBonus($order)
     {
-        $fields = $order->GetFields();
-        $values = $fields->GetValues();
 
         \Itb\Bonus\Event\BonusOrder::onOrderSave($order);
 

@@ -13,11 +13,21 @@ if ((!empty($request['apply']) || !empty($request->getPost('save'))) && !empty($
     $arSaveFields['USER'] =   $USER->GetID();
 
 
+    $priceConditions = array(
+        "MIN_PAYMENT_BONUS" => $request->getPost('min_payment_bonus') ? $request->getPost('min_payment_bonus') : 0,
+        "MIN_PAYMENT_TYPE" => $request->getPost('min_payment_type'),
+        "MIN_PAYMENT_INCLUDE_SHIPPING" => $request->getPost('min_payment_include_shipping'),
+        "MAX_PAYMENT_BONUS" => $request->getPost('max_payment_bonus') ? $request->getPost('max_payment_bonus') : 0,
+        "MAX_PAYMENT_TYPE" => $request->getPost('max_payment_type'),
+        "MAX_PAYMENT_INCLUDE_SHIPPING" => $request->getPost('max_payment_include_shipping')
+    );
+
     $saveConditions = [];
     if (!empty($request->getPost("profileProductsCond")))
         $saveConditions = \Itb\Bonus\Conditions\OrderBonus::SaveConditions($request["profileProductsCond"]);
 
     $arSaveFields['CONDITIONS'] = serialize($saveConditions);
+    $arSaveFields['CONDITIONS_PRICE'] = serialize($priceConditions);
 
 
     if (!empty($request->getPost("add_bonus")))

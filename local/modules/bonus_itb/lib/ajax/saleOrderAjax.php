@@ -6,6 +6,8 @@ use Bitrix\Sale\PriceMaths;
 use Bitrix\Sale\Discount;
 use Bitrix\Sale\DiscountBase;
 use Bitrix\Sale\DiscountCouponsManager;
+use Itb\Entity\BonusAddTable;
+
 \Bitrix\Main\Loader::includeModule("bonus_itb");
 
 class SaleOrderAjax {
@@ -275,6 +277,9 @@ class SaleOrderAjax {
 
 
         $UserBonusSystemDostup = 'Y';
+
+        $arBonus = \Itb\Bonus\CalculateBonus::getBonusPrice($arItems, $arOrderParams);
+
         $arResult["MIN_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["MIN_BONUS"] = $minBonusSum;
         $arResult["MAX_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["MAX_BONUS"] = $maxBonusSum;
         $arResult["USER_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["USER_BONUS"] = $UserBallance;
@@ -373,12 +378,12 @@ class SaleOrderAjax {
 
         //Udalyaem platejnie sistemi bonusov iz shablona
         foreach($arResult["JS_DATA"]["PAY_SYSTEM"] as $keyPaysystem => $paySystem):
-            if($paySystem["CODE"] == 'LOGICTIM_PAYMENT_BONUS')
+            if($paySystem["CODE"] == 'ITB_PAYMENT_BONUS')
                 unset($arResult["JS_DATA"]["PAY_SYSTEM"][$keyPaysystem]);
         endforeach;
         $arResult["JS_DATA"]["PAY_SYSTEM"] = array_values($arResult["JS_DATA"]["PAY_SYSTEM"]);
         foreach($arResult["PAY_SYSTEM"] as $keyPaysystem => $paySystem):
-            if($paySystem["CODE"] == 'LOGICTIM_PAYMENT_BONUS')
+            if($paySystem["CODE"] == 'ITB_PAYMENT_BONUS')
                 unset($arResult["PAY_SYSTEM"][$keyPaysystem]);
         endforeach;
         $arResult["PAY_SYSTEM"] = array_values($arResult["PAY_SYSTEM"]);
@@ -394,56 +399,381 @@ class SaleOrderAjax {
 
     }
 
+    public static function saleOrderBeforeSaved($order){
 
-    public static function saleOrderSaved($order){
+        $is_new = $order->isNew();
+        $fields = $order->GetFields();
+        $values = $fields->GetValues();
+        $basket = $order->getBasket();
 
-        global $USER;
-
-        $user = new \CUser;
-        $inofOrder = $order->toArray();
+        //Payments
         $paymentCollection = $order->getPaymentCollection();
-        $propertyCollection = $order->getPropertyCollection();
-        $paysystemName = $paymentCollection->toArray()[0]['PAY_SYSTEM_NAME'];
-        $paysystemId = $paymentCollection->getOrder()->getFields()->getValues()['PAY_SYSTEM_ID'];
-        $payAllSum = $paymentCollection->getOrder()->getFields()->getValues()['PRICE'];
-        $bonus_val = 0;
-        $properties = $propertyCollection->getArray()['properties'];
+        $arPayments = array();
+        foreach($paymentCollection as $payment):
+            $paymentId = $payment->getPaymentSystemId();
+            $arPayments[$paymentId] = array("ID"=>$paymentId, "SUM"=>$payment->getSum(), "NAME"=>$payment->getPaymentSystemName(), "IS_PAYED"=>$payment->isPaid());
+        endforeach;
 
-        if($USER->IsAuthorized())
-            $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance($inofOrder["USER_ID"]);
-        else
-            $UserBallance = 0;
+        //Delivery
+        $deliveryCollection = $order->getDeliverySystemId();
+        $arDelivery = array();
+        foreach($deliveryCollection as $delivery):
+            $arDelivery[$delivery] = array("ID"=>$delivery);
+        endforeach;
 
-        foreach ($properties as $prop){
-            if ($prop['CODE'] == 'ITB_PAYMENT_BONUS'){
-                $bonus_val =  $prop['VALUE'][0];
+        //GET ORDER PROPERTIES
+        $props = $order->getPropertyCollection();
+        foreach($props as $prop):
+            $propFields = $prop->GetFields();
+            $propValues = $propFields->GetValues();
+            if($propValues["CODE"] == 'ITB_PAYMENT_BONUS')
+            {
+                $pay_bonus = $propValues["VALUE"];
+                $payBonusPropId = $propValues["ORDER_PROPS_ID"];
             }
-        }
+        endforeach;
 
-        if ($paysystemName == 'Бонусный счет'){
+        $discountData = $order->getDiscount()->getApplyResult();
+        $arOrderParams = array(
+            "ORDER_ID" => $order->getId(),
+            "ORDER_NUM" => $values["ACCOUNT_NUMBER"],
+            "SITE_ID" => $order->getSiteId(),
+            "USER_ID" => $order->getUserId(),
+            "ORDER_SUM" => $order->getPrice(),
+            "CART_SUM" => $basket->getPrice(),
+            "DELIVERY_SUM" => $order->getDeliveryPrice(),
+            "PERSON_TYPE_ID" => $order->getPersonTypeId(),
+            "CURRENCY" => $order->getCurrency(),
+            "DISCOUNT" => $order->getDiscountPrice(),
+            "DISCOUNT_DATA" => $discountData["DISCOUNT_LIST"],
+            "PAYMENTS" => $arPayments,
+            "DELIVERY" => $arDelivery,
+        );
+        $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance($arOrderParams["USER_ID"]);
 
-            if ($inofOrder['PRICE'] < (int)$bonus_val && $UserBallance > 0 ){
+        if($is_new && $UserBallance > 0 && $pay_bonus > 0):
 
-                $bonus_after = (int)$bonus_val - $inofOrder['PRICE'];
+            //Korzina zakaza
+            $arItems = array();
+            foreach ($basket as $basketItem):
+                $arItem = array();
+                $arItem["PRODUCT_ID"] = $basketItem->getProductId();
+                $arItem["BASKET_ID"] = $basketItem->getId();
+                $arItem["NAME"] = $basketItem->getField('NAME');
+                $arItem["QUANTITY"] = $basketItem->getQuantity();
+                $arItem["BASE_PRICE"] = $basketItem->getField('BASE_PRICE');
+                $arItem["PRICE"] = $basketItem->getPrice();
+                $arItem["DISCOUNT_PRICE"] = $basketItem->getField('DISCOUNT_PRICE');
+                $arItem["POSITION_FINAL_PRICE"] = $basketItem->getFinalPrice();
+                $arItems[$arItem["BASKET_ID"]] = $arItem;
+            endforeach;
 
-                $newBalance = $UserBallance - $inofOrder['PRICE'] + $bonus_after;
+            $arOrderParams["PAY_BONUS"] = $pay_bonus;
+            $arPayBonus = \Itb\Bonus\CalculateBonus::OrderBonusPayment($arItems, $arOrderParams);
 
-                $fields = [
-                    "UF_BONUS_COUNT" => $newBalance,
-                ];
+            if($arPayBonus["PAY_BONUS"] > 0)
+            {
+                $minBonusSum = $arPayBonus["MIN_ORDER_PAY"];
+                $maxBonusSum = $arPayBonus["MAX_ORDER_PAY"];
+                $pay_bonus = $arPayBonus["PAY_BONUS"];
+                $bonusPayCart = $arPayBonus["PAY_CART"];
+                $bonusPayDelivery = $arPayBonus["PAY_DELIVERY"];
+                $newDeliveryPrice = $arPayBonus["NEW_DELIVERY_PRICE"];
+            }
+            else
+            {
+                $PayBonusProp = $props->getItemByOrderPropertyId($payBonusPropId);
+                $PayBonusProp->setValue(0);
+                return;
+            }
 
-                if ($order->getId() === 0) {
-                    $result = $user->Update($inofOrder["USER_ID"], $fields);
-                    if ($paymentCollection->count() > 0) {
-                        foreach ($paymentCollection as $payment) {
-                            $payment->setField('PAID', 'Y');
+
+            $PayBonusToDiscount = \COption::GetOptionString("bonus_itb", "DISCOUNT_TO_PRODUCTS", 'N');
+            if($PayBonusToDiscount == 'Y' || $PayBonusToDiscount == 'B'):
+
+                //Raskidivaem skidku po tovaram v korzine
+                if($bonusPayCart > 0):
+
+                    //Gotovim ceni zaranee iz-za baga bitrix
+                    foreach($basket as $basketItem):
+                        $item = $basketItem->getFields();
+                        $arItem = $item->getValues();
+                        $arItem["BASKET_ID"] = $basketItem->getId();
+
+                        //Esli tovar nel'zya oplatit' bonusami
+                        if($arPayBonus["PAY_PRODUCTS"]["ITEMS"][$arItem["BASKET_ID"]]["ADD_BONUS"] > 0 || $arPayBonus["PAY_PRODUCTS"]["PROFILE"]["NO_PRODUCT_CONDITIONS"] == 'Y')
+                        {
+                            $canPayProduct = $arPayBonus["PAY_PRODUCTS"]["ITEMS"][$arItem["BASKET_ID"]]["ADD_BONUS"];
+                            $canPayProductUnit = $arPayBonus["PAY_PRODUCTS"]["ITEMS"][$arItem["BASKET_ID"]]["ADD_BONUS_UNIT"];
+                            $canPayQuantity = $arPayBonus["PAY_PRODUCTS"]["ITEMS"][$arItem["BASKET_ID"]]["QUANTITY"];
+                        }
+                        else
+                            continue;
+
+                        //Procentnoe sootnoshenie pozicii tovara s obshhej summoj
+                        if($arPayBonus["PAY_PRODUCTS"]["PROFILE"]["NO_PRODUCT_CONDITIONS"] == 'Y') //Esli net usloviy po tovaram, no est' ogranichenie po summe oplati zakaza
+                            $productPart = $arItem["PRICE"] * $arItem["QUANTITY"] * 100 / $arPayBonus["PAY_PRODUCTS_SUM"];
+                        else
+                            $productPart = $canPayProductUnit * $canPayQuantity * 100 / $arPayBonus["PAY_PRODUCTS"]["ALL_BONUS"];
+
+                        $discountPlusPosition = $bonusPayCart * $productPart / 100; //Skol'ko rublej nado pripljusovat' k skidke pozicii tovara
+                        $discountPlusUnit = $discountPlusPosition / $arItem["QUANTITY"];
+                        $newPrice = $arItem["PRICE"] - $discountPlusUnit; //Cena s uchetom raskidanooj skidki
+                        $newPriceRound = \Bitrix\Catalog\Product\Price::roundPrice($arItem["PRICE_TYPE_ID"], $newPrice, $arItem["CURRENCY"]);
+                        $payBonusUnit = $arItem["PRICE"] - $newPriceRound;
+                        $payBonusPosition = $payBonusUnit * $arItem["QUANTITY"];
+                        $newDiscount = $arItem["BASE_PRICE"] - $newPriceRound; //Skidka s uchetom dobavlennoj novoj skidki
+
+                        $arNewPrices[$arItem["BASKET_ID"]] = array(
+                            "NEW_PRICE" => $newPriceRound,
+                            "NEW_DISCOUNT" => $newDiscount,
+                            "BASE_PRICE" => $arItem["BASE_PRICE"],
+                            "BITRIX_DISCOUNT_PRICE" => $arItem["PRICE"],
+                            "PAY_BONUS_QUANTITY" => $payBonusUnit,
+                            "PAY_BONUS_POSITION" => $payBonusPosition
+                        );
+                    endforeach;
+
+                    //Menyaem ceni
+                    $customPriceNewApi = "Y";
+                    foreach($basket as $basketItem):
+                        $item = $basketItem->getFields();
+                        $arItem = $item->getValues();
+                        $arItem["BASKET_ID"] = $basketItem->getId();
+
+                        //Esli tovar nel'zya oplatit' bonusami
+                        if($arPayBonus["PAY_PRODUCTS"]["ITEMS"][$arItem["BASKET_ID"]]["ADD_BONUS"] > 0 || $arPayBonus["PAY_PRODUCTS"]["PROFILE"]["NO_PRODUCT_CONDITIONS"] == 'Y')
+                            $canPayProduct = $arPayBonus["PAY_PRODUCTS"]["ITEMS"][$arItem["BASKET_ID"]]["ADD_BONUS"];
+                        else
+                            continue;
+
+
+                        if(isset($arNewPrices[$arItem["BASKET_ID"]]))
+                        {
+                            if($customPriceNewApi == 'Y')
+                                $basketItem->markFieldCustom('PRICE');
+                            else
+                                $basketItem->setField('CUSTOM_PRICE', 'Y');
+                            $basketItem->setField('PRICE', $arNewPrices[$arItem["BASKET_ID"]]["NEW_PRICE"]);
+                            $basketItem->setField('BASE_PRICE', $arNewPrices[$arItem["BASKET_ID"]]["BASE_PRICE"]);
+                            $basketItem->setField('DISCOUNT_PRICE', $arNewPrices[$arItem["BASKET_ID"]]["NEW_DISCOUNT"]);
+
+                            //zapisivaem novie ceni v nash massiv
+                            $arItems[$arItem["BASKET_ID"]]["PRICE"] = $arNewPrices[$arItem["BASKET_ID"]]["NEW_PRICE"];
+                            $arItems[$arItem["BASKET_ID"]]["BASE_PRICE"] = $arNewPrices[$arItem["BASKET_ID"]]["BASE_PRICE"];
+                            $arItems[$arItem["BASKET_ID"]]["DISCOUNT_PRICE"] = $arNewPrices[$arItem["BASKET_ID"]]["NEW_DISCOUNT"];
+
+                        }
+                    endforeach;
+                endif;
+
+                //Esli bonusami oplacheno bol'she, chem stoimost korzini, to vichitaem ih iz dostavki
+                if($bonusPayDelivery > 0):
+                    $shipmentCollection = $order->getShipmentCollection();
+                    foreach($shipmentCollection as $shipment):
+                        if(!$shipment->isSystem()) {
+                            $basePrice = $shipment->getField('BASE_PRICE_DELIVERY');
+                            $shipment->setFields(array(
+                                'PRICE_DELIVERY' => $newDeliveryPrice, 'BASE_PRICE_DELIVERY' => $basePrice, 'DISCOUNT_PRICE' => $basePrice-$newDeliveryPrice, 'CUSTOM_PRICE_DELIVERY' => 'Y'
+                            ));
+                            //iz-za baga bitrix prihoditsya ustanovit cenu dostavki snachala kak custom, a potom pomenyat na ne custom. Inache ne pereschitivaet zakaz
+                            $shipment->setFields(array(
+                                'CUSTOM_PRICE_DELIVERY' => 'N'
+                            ));
+                        }
+                    endforeach;
+                endif;
+
+
+                //Menyaem summu k oplate
+                $pay_bonus = $arOrderParams["ORDER_SUM"] - $order->getPrice();
+
+                $allPaimentsSum = 0;
+                foreach($paymentCollection as $arPayment):
+                    $fields = $arPayment->GetFields();
+                    $values = $fields->GetValues();
+                    $allPaimentsSum = $allPaimentsSum + $values["SUM"];
+                endforeach;
+
+                foreach($paymentCollection as $arPayment):
+                    $fields = $arPayment->GetFields();
+                    $values = $fields->GetValues();
+
+                    if($pay_bonus > 0 && $values["SUM"] <= 0)
+                        $arPayment->setField("PAID", "Y");
+
+                    if($values["SUM"] && $pay_bonus > 0 && $allPaimentsSum > $order->getPrice()) //bitrix c versii 17.8-18.0 stal sam pereschitivat oplatu, poetomu dobavleno uslovie  $values["SUM"] > $order->getPrice()
+                    {
+                        if($arPayment->isInner())
+                        {
+                            if($pay_bonus + $values["SUM"] > $arOrderParams["ORDER_SUM"])
+                            {
+                                $new_pay_sum = $values["SUM"] - ($pay_bonus + $values["SUM"] - $arOrderParams["ORDER_SUM"]);
+                                $pay_bonus = $pay_bonus - ($pay_bonus + $values["SUM"] - $arOrderParams["ORDER_SUM"]);
+                                $arPayment->setField("SUM", $new_pay_sum);
+                            }
+                            else
+                            { continue;}
+                        }
+                        else
+                        {
+                            $new_pay_sum = $values["SUM"] - $pay_bonus;
+                            if($new_pay_sum < 0)
+                                $new_pay_sum = 0;
+                            $arPayment->setField("SUM", $new_pay_sum);
+                            if($new_pay_sum <= 0)
+                                $arPayment->setField("PAID", "Y");
                         }
                     }
+                endforeach;
+
+            else:
+
+                //Menyaem summu k oplate
+                foreach($paymentCollection as $arPayment):
+                    $fields = $arPayment->GetFields();
+                    $values = $fields->GetValues();
+
+                    if($values["SUM"] && $pay_bonus > 0)
+                    {
+                        if($arPayment->isInner())
+                        {
+                            if($pay_bonus + $values["SUM"] > $arOrderParams["ORDER_SUM"])
+                            {
+                                $new_pay_sum = $values["SUM"] - ($pay_bonus + $values["SUM"] - $arOrderParams["ORDER_SUM"]);
+                                $arPayment->setField("SUM", $new_pay_sum);
+                            }
+                            else
+                            { continue;}
+                        }
+                        else
+                        {
+                            $new_pay_sum = $values["SUM"] - $pay_bonus;
+                            if($new_pay_sum < 0)
+                                $new_pay_sum = 0;
+                            $arPayment->setField("SUM", $new_pay_sum);
+                            if($new_pay_sum <= 0)
+                                $arPayment->setField("PAID", "Y");
+                        }
+                    }
+                endforeach;
+
+                //ADD PAYMENT BONUS
+                if($pay_bonus > 0)
+                {
+                    //Get ID of paysystem Bonus
+                    $paySystemId = \Itb\Bonus\ItbHelpers::PaySystemBonusId();
+                    $paymentCollection = $order->getPaymentCollection();
+                    $paymentBonus = $paymentCollection->createItem(\Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId));
+                    $paymentBonus->setField("SUM", $pay_bonus);
+                    $paymentBonus->setField("PAID", "Y");
                 }
 
-            }
-        }
+            endif;
+
+        endif;
     }
 
+
+    public static function saleOrderAfterSaved($order){
+
+        $is_new = $order->isNew();
+        $is_payed = $order->isPaid();
+        $fields = $order->GetFields();
+        $values = $fields->GetValues();
+        $user_id = $values["USER_ID"];
+        $order_id = $values["ID"];
+        $order_num = $values["ACCOUNT_NUMBER"];
+
+        $basket = $order->getBasket();
+
+        $arItems = array();
+        foreach($basket as $basketItem):
+            $arItem = array();
+            $arItem["PRODUCT_ID"] = $basketItem->getProductId();
+            $arItem["BASKET_ID"] = $basketItem->getId();
+            $arItem["NAME"] = $basketItem->getField('NAME');
+            $arItem["QUANTITY"] = $basketItem->getQuantity();
+            $arItem["BASE_PRICE"] = $basketItem->getField('BASE_PRICE');
+            $arItem["PRICE"] = $basketItem->getPrice();
+            $arItem["DISCOUNT_PRICE"] = $basketItem->getField('DISCOUNT_PRICE');
+            $arItem["PRICE_POSITION"] = $basketItem->getFinalPrice();
+
+            if(isset($resultDiscounts["PRICES"]["BASKET"][$arItem["BASKET_ID"]]))
+            {
+                $arItem["BASE_PRICE"] = $resultDiscounts["PRICES"]["BASKET"][$arItem["BASKET_ID"]]["BASE_PRICE"];
+                $arItem["PRICE"] = $resultDiscounts["PRICES"]["BASKET"][$arItem["BASKET_ID"]]["PRICE"];
+                $arItem["DISCOUNT_PRICE"] = $resultDiscounts["PRICES"]["BASKET"][$arItem["BASKET_ID"]]["DISCOUNT"];
+                $arItem["PRICE_POSITION"] = $arItem["QUANTITY"] * $arItem["PRICE"];
+            }
+            $arItems[$arItem["BASKET_ID"]] = $arItem;
+        endforeach;
+
+        $arBonus = \Itb\Bonus\CalculateBonus::getBonusPrice($arItems, $fields);
+
+        if($user_id > 0):
+            $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance($user_id);
+
+            $props = $order->getPropertyCollection();
+            foreach($props as $prop)
+            {
+                $fields = $prop->GetFields();
+                $values = $fields->GetValues();
+                if($values["CODE"] == 'ITB_PAYMENT_BONUS')
+                    $pay_bonus = $values["VALUE"];
+            }
+
+            if($is_new && $UserBallance > 0 && $pay_bonus > 0) {
+
+                $paymentCollection = $order->getPaymentCollection();
+                foreach($paymentCollection as $arPayment):
+                    $fields = $arPayment->GetFields();
+                    $values = $fields->GetValues();
+                    $paySystemId = \Itb\Bonus\ItbHelpers::PaySystemBonusId();
+                    if($values["PAY_SYSTEM_ID"] == $paySystemId)
+                        $paymentId = $values["ID"];
+                endforeach;
+
+                $UserBallanceafter = $UserBallance - $pay_bonus + $arBonus['ALL_BONUS'];
+
+                $arFields = array(
+                    "MINUS_BONUS" => $pay_bonus,
+                    "USER_ID" => $user_id,
+                    "OPERATION_TYPE" => 'MINUS_FROM_ORDER',
+                    "AFTER_PRICE_BONUS" => $UserBallanceafter,
+                    "ORDER_ID" => $order_id,
+                    "BONUS_PRICE" => $arBonus['ALL_BONUS'],
+                    "TYPE" => 'order',
+                    "BEFORE_PRICE_BONUS" => $UserBallance,
+                );
+
+                $addBonusUser =  \Itb\Bonus\Event\BonusOrder::MinusBonusUser($arFields);
+
+                if ($addBonusUser)
+                  BonusAddTable::add($arFields);
+
+            }elseif ($is_new && $UserBallance >= 0 && !$is_payed ){
+
+                $UserBallanceafter = (int)$UserBallance - (int)$pay_bonus + $arBonus['ALL_BONUS'];
+
+                $arFields = array(
+                    "MINUS_BONUS" => $pay_bonus,
+                    "USER_ID" => $user_id,
+                    "OPERATION_TYPE" => 'PAYED_N',
+                    "AFTER_PRICE_BONUS" => $UserBallanceafter,
+                    "ORDER_ID" => $order_id,
+                    "BONUS_PRICE" => $arBonus['ALL_BONUS'],
+                    "TYPE" => 'order',
+                    "BEFORE_PRICE_BONUS" => $UserBallance,
+                );
+
+                BonusAddTable::add($arFields);
+
+            }
+
+        endif;
+
+
+    }
 
 }

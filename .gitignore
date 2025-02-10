@@ -99,3 +99,8 @@ bower_components
 composer.phar
 /vendor/*
 /files/*
+/bitrix/templates/
+/local/templates/
+/local/php_interface/
+/local/components/
+/exm2/

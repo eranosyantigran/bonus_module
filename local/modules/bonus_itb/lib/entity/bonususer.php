@@ -28,8 +28,17 @@ Class BonusAddTable extends Entity\DataManager
             new Entity\StringField('TYPE', array(
                 'column_name' => 'type',
             )),
-            new Entity\IntegerField('BONUS_ID', array(
-                'column_name' => 'bonus_id',
+            new Entity\StringField('OPERATION_TYPE', array(
+                'column_name' => 'operation_type',
+            )),
+            new Entity\FloatField('MINUS_PRICE', array(
+                'column_name' => 'minus_price',
+            )),
+            new Entity\FloatField('AFTER_PRICE_BONUS', array(
+                'column_name' => 'after_price_bonus',
+            )),
+            new Entity\FloatField('BEFORE_PRICE_BONUS', array(
+                'column_name' => 'before_price_bonus',
             )),
             new Entity\FloatField('BONUS_PRICE', array(
                 'column_name' => 'bonus_price',

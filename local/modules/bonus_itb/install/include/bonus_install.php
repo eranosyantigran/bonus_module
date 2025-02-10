@@ -29,7 +29,18 @@ $saveProductConditions = array(
     )
 );
 
+$priceConditions = array(
+    "MIN_PAYMENT_BONUS" => 0,
+    "MIN_PAYMENT_TYPE" => 'bonus',
+    "MIN_PAYMENT_INCLUDE_SHIPPING" => 'N',
+    "MAX_PAYMENT_BONUS" => 100,
+    "MAX_PAYMENT_TYPE" => 'percent',
+    "MAX_PAYMENT_INCLUDE_SHIPPING" => 'N'
+);
+
+
 $arSaveFields['CONDITIONS'] = serialize($saveProductConditions);
+$arSaveFields['CONDITIONS_PRICE'] = serialize($priceConditions);
 
 
 \Itb\Entity\BonusEventTable::add($arSaveFields);

@@ -157,6 +157,7 @@ class CalculateBonus
         while ($arProfil = $arProfiles->fetch()){
 
                 $prof =  unserialize($arProfil['CONDITIONS'])['children'];
+                $condition_price =  unserialize($arProfil['CONDITIONS_PRICE']);
                 foreach($prof as $condProf):
                     if($condProf["controlId"] == 'conditionGroup2' && $condProf["values"]["bonus_from_props"] != '')
                         $arBonusProps[] = $condProf["values"]["bonus_from_props"];
@@ -441,7 +442,7 @@ class CalculateBonus
             $arProfile = end($arProfiles);
             $arResult["PROFILE"] = array(
                 "PROFILE_ID" => $mainProfile,
-                "OTHER_CONDITIONS" => unserialize($arProfile["other_conditions"])
+                "OTHER_CONDITIONS" => $condition_price
             );
             if(empty($arProfile["PRODUCT_CONDITIONS"]))
                 $arResult["PROFILE"]["NO_PRODUCT_CONDITIONS"] = 'Y';
@@ -1285,10 +1286,6 @@ class CalculateBonus
                             }
 
                             break;
-
-
-
-
                     }
                     if($done == 'Y')
                         $arDone["CONDITIONS_DONE"][] = $arCondition;
@@ -1505,5 +1502,57 @@ class CalculateBonus
         $arResult["ORDER_PARAMS"] = $arOrderParams;
 
         return $arResult;
+    }
+
+    public static function getBonusPrice($arItems, $orderParams){
+
+        $arResult = [];
+        $arBonus = BonusEventTable::getList();
+
+        if (!empty($arBonus)){
+
+            $arBonus = $arBonus->fetch();
+            $arrbonuscond = unserialize($arBonus['CONDITIONS']);
+            $bonusVal = 0;
+            $bonusType = '';
+            $round_method = '';
+            $round = 0;
+
+            if (count($arrbonuscond['children']) > 0){
+                foreach ($arrbonuscond['children'] as $condition){
+                    $bonusVal = (int)$condition['values']['bonus'];
+                    $bonusType = $condition['values']['bonus_type'];
+                    $round_method = $condition['values']['round_method'];
+                    $round = (int)$condition['values']['round'];
+                }
+            }
+
+            $arrPrice = [];
+
+            if (!empty($arItems)){
+
+                foreach ($arItems as $item){
+                    $price = (int)$item['BASE_PRICE'] ;
+                    if ($bonusType == "percent"){
+                        $prices = (($price * $bonusVal) / 100) * $item['QUANTITY'] ;
+                        $arrPrice[] = round($prices, $round);
+                    }elseif ($bonusType == "bonus"){
+                        $arrPrice[] = $bonusVal;
+                    }
+                }
+            }
+        }
+
+        $allPrice = 0;
+        if (!empty($arrPrice)){
+            foreach ($arrPrice as $priceitem){
+                $allPrice += $priceitem;
+            }
+        }
+
+        $arResult['ALL_BONUS'] = $allPrice;
+
+        return $arResult;
+
     }
 }
