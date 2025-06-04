@@ -4,7 +4,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/prolog_admi
 
 use \Bitrix\Main\Application,
     Bitrix\Main\Localization\Loc,
-    Itb\Entity\BonusEventTable,
+    Itb\Bonus\Entity\BonusEventTable,
     Itb\Bonus\Conditions;
 
 $module_id='bonus_itb';

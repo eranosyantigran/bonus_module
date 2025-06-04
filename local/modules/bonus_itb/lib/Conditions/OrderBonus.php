@@ -1,7 +1,7 @@
 <?php
 namespace Itb\Bonus\Conditions;
 
-use Itb\Bonus\ItbHelpers;
+use Itb\Bonus\Helper\ItbHelpers;
 
 class OrderBonus
 {
@@ -338,8 +338,8 @@ class OrderBonus
 
         );
 
-        $arCatalogs = \Itb\Bonus\ItbHelpers::getCatalogs();
-        $arSites = \Itb\Bonus\ItbHelpers::GetListSties();
+        $arCatalogs = ItbHelpers::getCatalogs();
+        $arSites = ItbHelpers::GetListSties();
         $params[] = array(
             'controlgroup'=> '1',
             'group'=> false,

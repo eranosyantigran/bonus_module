@@ -1,7 +1,8 @@
 <?php
-namespace Itb\Bonus;
+namespace Itb\Bonus\Class;
 
-use Itb\Entity\BonusEventTable;
+use Itb\Bonus\Entity\BonusEventTable;
+use Itb\Bonus\Helper\ItbHelpers;
 
 $module_id='bonus_itb';
 \Bitrix\Main\Loader::includeModule($module_id);
@@ -1350,7 +1351,7 @@ class CalculateBonus
     {
         $arResult = array();
 
-        $UserBallance = (float)\Itb\Bonus\ItbHelpers::UserBallance($arOrderParams["USER_ID"]);
+        $UserBallance = (float)ItbHelpers::UserBallance($arOrderParams["USER_ID"]);
 
         if($UserBallance <= 0)
             return;
@@ -1427,7 +1428,7 @@ class CalculateBonus
             else
                 $maxOrderPay = $arOrderParams["CART_SUM"] * (float)$arPayBonus["PROFILE"]["OTHER_CONDITIONS"]["MAX_PAYMENT_BONUS"] / 100;
         }
-        $maxOrderPay = \Itb\Bonus\ItbHelpers::Round($maxOrderPay, $round, 'DOWN');
+        $maxOrderPay = ItbHelpers::Round($maxOrderPay, $round, 'DOWN');
         /* MAX SUM FROM PROFILE */
 
         /* DELIVERY CONDITION */
@@ -1450,7 +1451,7 @@ class CalculateBonus
 
         if($canProductsPay+$canDeliveryPay < $maxOrderPay)
             $maxOrderPay = $canProductsPay + $canDeliveryPay;
-        $maxOrderPay = \Itb\Bonus\ItbHelpers::Round($maxOrderPay, $round, 'DOWN');
+        $maxOrderPay = ItbHelpers::Round($maxOrderPay, $round, 'DOWN');
         /* DELIVERY CONDITION */
 
 
@@ -1461,8 +1462,8 @@ class CalculateBonus
         if($maxOrderPay < $minOrderPayRound)
             $pay_bonus = '0';
         if($maxOrderPay > $UserBallance)
-            $maxOrderPay = \Itb\Bonus\ItbHelpers::Round($UserBallance, $round, 'DOWN');
-        $pay_bonus = \Itb\Bonus\ItbHelpers::Round($pay_bonus, $round, 'DOWN');
+            $maxOrderPay = ItbHelpers::Round($UserBallance, $round, 'DOWN');
+        $pay_bonus = ItbHelpers::Round($pay_bonus, $round, 'DOWN');
 
         if($pay_bonus > $UserBallance || $pay_bonus < $minOrderPay || $pay_bonus > $maxOrderPay)
             $pay_bonus = '0';
@@ -1496,12 +1497,39 @@ class CalculateBonus
 
         $arResult["MIN_ORDER_PAY"] = $minOrderPay;
         $arResult["MIN_ORDER_PAY_ROUND"] = $minOrderPayRound;
-        $arResult["MAX_ORDER_PAY"] = \Itb\Bonus\ItbHelpers::Round($maxOrderPay, $round, 'DOWN');
+        $arResult["MAX_ORDER_PAY"] = ItbHelpers::Round($maxOrderPay, $round, 'DOWN');
         $arResult["PAY_PRODUCTS"] = $arPayBonus;
 
         $arResult["ORDER_PARAMS"] = $arOrderParams;
 
         return $arResult;
+    }
+    public static function calcUnitAndPosition($arPrice, $quantity, $arBonus, $arParams)
+    {
+        if($arBonus["ROUND_TYPE"] == 'UNIT')
+        {
+            $bonusOffer = $arBonus["BONUS"]*$arPrice["DISCOUNT_PRICE"]/100;
+            $bonusOffer = ItbHelpers::Round($bonusOffer, $arBonus["ROUND"], $arBonus["ROUND_METHOD"]);
+
+            if($arParams["PROFILE_TYPE"] == 'pay_bonus')
+                $bonusOffer = round($arBonus["BONUS"]*$arPrice["DISCOUNT_PRICE"]/100, $arBonus["ROUND"]); //$bonusOffer = bcdiv($arBonus["BONUS"]*$arPrice["DISCOUNT_PRICE"]/100, 1, $arBonus["ROUND"]);
+
+            $bonusOfferAll = $bonusOffer * $quantity;
+        }
+        else // == 'POSITION'
+        {
+            $bonusOfferAll = $arPrice["DISCOUNT_PRICE"]*$arBonus["BONUS"]/100 * $quantity;
+            $bonusOfferAll = ItbHelpers::Round($bonusOfferAll, $arBonus["ROUND"], $arBonus["ROUND_METHOD"]);
+
+            if($arParams["PROFILE_TYPE"] == 'pay_bonus')
+                $bonusOfferAll = round($arPrice["DISCOUNT_PRICE"]*$arBonus["BONUS"]/100 * $quantity, $arBonus["ROUND"]); //$bonusOfferAll = bcdiv($arPrice["DISCOUNT_PRICE"]*$arBonus["BONUS"]/100 * $quantity, 1, $arBonus["ROUND"]);
+
+            $bonusOffer = round($bonusOfferAll / $quantity, 2);
+        }
+
+        $result  = array('BONUS_UNIT' => $bonusOffer, 'BONUS_POSITION' => $bonusOfferAll);
+
+        return $result;
     }
 
     public static function getBonusPrice($arItems, $orderParams){

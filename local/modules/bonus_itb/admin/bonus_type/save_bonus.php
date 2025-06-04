@@ -34,11 +34,11 @@ if ((!empty($request['apply']) || !empty($request->getPost('save'))) && !empty($
         $arSaveFields['ADD_BONUS'] = (float)str_replace(',', '.', $request->getPost("add_bonus"));
 
     if ($request->getPost('id') == 'new')
-        $id =   \Itb\Entity\BonusEventTable::add($arSaveFields);
+        $id =   \Itb\Bonus\Entity\BonusEventTable::add($arSaveFields);
     elseif ($request->getPost('action') == 'copy')
-        $id =  \Itb\Entity\BonusEventTable::add($arSaveFields);
+        $id =  \Itb\Bonus\Entity\BonusEventTable::add($arSaveFields);
     else {
-        \Itb\Entity\BonusEventTable::update($request->getPost('id'), $arSaveFields);
+        \Itb\Bonus\Entity\BonusEventTable::update($request->getPost('id'), $arSaveFields);
         $id = $request->getPost('id');
     }
 

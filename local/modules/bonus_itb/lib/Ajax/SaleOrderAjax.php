@@ -6,7 +6,10 @@ use Bitrix\Sale\PriceMaths;
 use Bitrix\Sale\Discount;
 use Bitrix\Sale\DiscountBase;
 use Bitrix\Sale\DiscountCouponsManager;
-use Itb\Entity\BonusAddTable;
+use Itb\Bonus\Entity\BonusAddTable;
+use Itb\Bonus\Helper\ItbHelpers;
+use Itb\Bonus\Class\CalculateBonus;
+use Itb\Bonus\Event\BonusOrder;
 
 \Bitrix\Main\Loader::includeModule("bonus_itb");
 
@@ -77,7 +80,7 @@ class SaleOrderAjax {
 
         global $USER;
         if($USER->IsAuthorized())
-            $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance($arOrderParams["USER_ID"]);
+            $UserBallance = ItbHelpers::UserBallance($arOrderParams["USER_ID"]);
         else
             $UserBallance = 0;
 
@@ -112,7 +115,7 @@ class SaleOrderAjax {
             }
 
             $arOrderParams["PAY_BONUS"] = $pay_bonus;
-            $arPayBonus = \Itb\Bonus\CalculateBonus::OrderBonusPayment($arItems, $arOrderParams);
+            $arPayBonus = CalculateBonus::OrderBonusPayment($arItems, $arOrderParams);
             $minBonusSum = $arPayBonus["MIN_ORDER_PAY"];
             $maxBonusSum = $arPayBonus["MAX_ORDER_PAY"];
             $pay_bonus = $arOrderParams["PAY_BONUS"] = $arPayBonus["PAY_BONUS"];
@@ -278,7 +281,7 @@ class SaleOrderAjax {
 
         $UserBonusSystemDostup = 'Y';
 
-        $arBonus = \Itb\Bonus\CalculateBonus::getBonusPrice($arItems, $arOrderParams);
+        $arBonus = CalculateBonus::getBonusPrice($arItems, $arOrderParams);
 
         $arResult["MIN_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["MIN_BONUS"] = $minBonusSum;
         $arResult["MAX_BONUS"] = $arResult["JS_DATA"]["ITB_BONUS"]["MAX_BONUS"] = $maxBonusSum;
@@ -320,22 +323,22 @@ class SaleOrderAjax {
         {
             $payCooment .= \COption::GetOptionString("bonus_itb", "CAN_BONUS_TEXT".$langSufix, 'Can use bonus');
             if($minBonusSum > 0)
-                $payCooment .= ' '.\Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MIN_BONUS_TEXT".$langSufix, 'Min use bonus'), '#BONUS#', $minBonusSum);
+                $payCooment .= ' '.ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MIN_BONUS_TEXT".$langSufix, 'Min use bonus'), '#BONUS#', $minBonusSum);
             if($maxBonusSum > 0 && $maxBonusSum >= $minBonusSum)
-                $payCooment .= ' '.\Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MAX_BONUS_TEXT".$langSufix, 'Max use bonus'), '#BONUS#', $maxBonusSum);
+                $payCooment .= ' '.ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MAX_BONUS_TEXT".$langSufix, 'Max use bonus'), '#BONUS#', $maxBonusSum);
         }
         else
         {
             if($minBonusSum > 0)
-                $payCooment .= '<span>'.\Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MIN_BONUS_TEXT".$langSufix, 'Min use bonus'), '#BONUS#', $minBonusSum).'</span>';
+                $payCooment .= '<span>'.ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MIN_BONUS_TEXT".$langSufix, 'Min use bonus'), '#BONUS#', $minBonusSum).'</span>';
             if($maxBonusSum > 0 && $maxBonusSum >= $minBonusSum)
-                $payCooment .= '<span>'.\Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MAX_BONUS_TEXT".$langSufix, 'Max use bonus'), '#BONUS#', $maxBonusSum).'</span>';
+                $payCooment .= '<span>'.ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "MAX_BONUS_TEXT".$langSufix, 'Max use bonus'), '#BONUS#', $maxBonusSum).'</span>';
         }
         $errorMinBonusComment = '';
         if(\COption::GetOptionString("bonus_itb", "TEXT_BONUS_ERROR_MIN_BONUS".$langSufix, '') != '')
         {
             if(strpos(\COption::GetOptionString("bonus_itb", "TEXT_BONUS_ERROR_MIN_BONUS".$langSufix, ''), '#BONUS#') !== false)
-                $errorMinBonusComment .= \Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "TEXT_BONUS_ERROR_MIN_BONUS".$langSufix, ''), '#BONUS#', $minBonusSum);
+                $errorMinBonusComment .= ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "TEXT_BONUS_ERROR_MIN_BONUS".$langSufix, ''), '#BONUS#', $minBonusSum);
         }
         else
             $errorMinBonusComment .= $payCooment;
@@ -362,7 +365,7 @@ class SaleOrderAjax {
 
         $arResult["JS_DATA"]["ITB_BONUS"]["MODULE_LANG"] = array(
             "HAVE_BONUS_TEXT" => \COption::GetOptionString("bonus_itb", "HAVE_BONUS_TEXT".$langSufix, 'Have bonus'),
-            "HAVE_BONUS_TEXT_FORMAT" => \Itb\Bonus\ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "HAVE_BONUS_TEXT".$langSufix, 'Have bonus'), '#BONUS#', $UserBallance),
+            "HAVE_BONUS_TEXT_FORMAT" => ItbHelpers::FormatBonusString(\COption::GetOptionString("bonus_itb", "HAVE_BONUS_TEXT".$langSufix, 'Have bonus'), '#BONUS#', $UserBallance),
             "CAN_USE_BONUS_TEXT" => \COption::GetOptionString("bonus_itb", "CAN_BONUS_TEXT".$langSufix, 'Can use bonus'),
             "CAN_USE_BONUS_TEXT_FORMAT" => $payCooment,
             "MIN_BONUS_TEXT" => $minBonusText,
@@ -449,7 +452,7 @@ class SaleOrderAjax {
             "PAYMENTS" => $arPayments,
             "DELIVERY" => $arDelivery,
         );
-        $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance($arOrderParams["USER_ID"]);
+        $UserBallance = ItbHelpers::UserBallance($arOrderParams["USER_ID"]);
 
         if($is_new && $UserBallance > 0 && $pay_bonus > 0):
 
@@ -469,7 +472,7 @@ class SaleOrderAjax {
             endforeach;
 
             $arOrderParams["PAY_BONUS"] = $pay_bonus;
-            $arPayBonus = \Itb\Bonus\CalculateBonus::OrderBonusPayment($arItems, $arOrderParams);
+            $arPayBonus = CalculateBonus::OrderBonusPayment($arItems, $arOrderParams);
 
             if($arPayBonus["PAY_BONUS"] > 0)
             {
@@ -662,7 +665,7 @@ class SaleOrderAjax {
                 if($pay_bonus > 0)
                 {
                     //Get ID of paysystem Bonus
-                    $paySystemId = \Itb\Bonus\ItbHelpers::PaySystemBonusId();
+                    $paySystemId = ItbHelpers::PaySystemBonusId();
                     $paymentCollection = $order->getPaymentCollection();
                     $paymentBonus = $paymentCollection->createItem(\Bitrix\Sale\PaySystem\Manager::getObjectById($paySystemId));
                     $paymentBonus->setField("SUM", $pay_bonus);
@@ -709,10 +712,10 @@ class SaleOrderAjax {
             $arItems[$arItem["BASKET_ID"]] = $arItem;
         endforeach;
 
-        $arBonus = \Itb\Bonus\CalculateBonus::getBonusPrice($arItems, $fields);
+        $arBonus = CalculateBonus::getBonusPrice($arItems, $fields);
 
         if($user_id > 0):
-            $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance($user_id);
+            $UserBallance = ItbHelpers::UserBallance($user_id);
 
             $props = $order->getPropertyCollection();
             foreach($props as $prop)
@@ -729,7 +732,7 @@ class SaleOrderAjax {
                 foreach($paymentCollection as $arPayment):
                     $fields = $arPayment->GetFields();
                     $values = $fields->GetValues();
-                    $paySystemId = \Itb\Bonus\ItbHelpers::PaySystemBonusId();
+                    $paySystemId = ItbHelpers::PaySystemBonusId();
                     if($values["PAY_SYSTEM_ID"] == $paySystemId)
                         $paymentId = $values["ID"];
                 endforeach;
@@ -747,7 +750,7 @@ class SaleOrderAjax {
                     "BEFORE_PRICE_BONUS" => $UserBallance,
                 );
 
-                $addBonusUser =  \Itb\Bonus\Event\BonusOrder::MinusBonusUser($arFields);
+                $addBonusUser =  BonusOrder::MinusBonusUser($arFields);
 
                 if ($addBonusUser)
                   BonusAddTable::add($arFields);

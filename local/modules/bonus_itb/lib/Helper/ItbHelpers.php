@@ -1,5 +1,5 @@
 <?php
-namespace Itb\Bonus;
+namespace Itb\Bonus\Helper;
 
 class ItbHelpers
 {

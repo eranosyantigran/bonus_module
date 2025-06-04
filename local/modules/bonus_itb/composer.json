@@ -1,0 +1,17 @@
+{
+  "name": "your-vendor/bonus_itb",
+  "description": "Bonus module for Bitrix",
+  "type": "project",
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Itb\\Bonus\\": "lib/"
+    },
+    "files": [
+      "lib/bootstrap.php"
+    ]
+  },
+  "config": {
+    "prepend-autoloader": false
+  }
+}

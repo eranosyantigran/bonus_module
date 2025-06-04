@@ -4,8 +4,9 @@ namespace Itb\Bonus\Event;
 
 use Bitrix\Main\Loader;
 use Bitrix\Sale\Order;
-use Itb\Entity\BonusEventTable;
-use Itb\Entity\BonusAddTable;
+use Itb\Bonus\Entity\BonusEventTable;
+use Itb\Bonus\Entity\BonusAddTable;
+use Itb\Bonus\Helper\ItbHelpers;
 use \Bitrix\Main\UserTable;
 
 Loader::includeModule('sale');
@@ -32,10 +33,10 @@ class BonusOrder
                 ])->Fetch();
 
                 if ($rs['USER'] > 0):
-                    $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance($rs['USER']);
+                    $UserBallance = ItbHelpers::UserBallance($rs['USER']);
                     $user_id = $rs['USER'];
                 else:
-                    $UserBallance = \Itb\Bonus\ItbHelpers::UserBallance(1);
+                    $UserBallance = ItbHelpers::UserBallance(1);
                     $user_id = 1;
                 endif;
 
@@ -69,9 +70,9 @@ class BonusOrder
 
             if ($bonus_type == 'percent'){
                 $bonus_price = (int)$arrorder['SUM_PAID'] * $bonus / 100;
-                $bonus_price =  \Itb\Bonus\ItbHelpers::Round($bonus_price);
+                $bonus_price =  ItbHelpers::Round($bonus_price);
             }else{
-                $bonus_price = \Itb\Bonus\ItbHelpers::Round($bonus);
+                $bonus_price = ItbHelpers::Round($bonus);
             }
 
             return  ['BONUS_PRICE' => $bonus_price];

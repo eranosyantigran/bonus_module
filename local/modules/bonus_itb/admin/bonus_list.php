@@ -5,7 +5,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/prolog_admi
 use Bitrix\Main,
     Bitrix\Main\Application,
     Bitrix\Main\Localization\Loc,
-    Itb\Entity\BonusEventTable;
+    Itb\Bonus\Entity\BonusEventTable;
 Loc::loadMessages(__FILE__);
 
 global $APPLICATION;

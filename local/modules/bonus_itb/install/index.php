@@ -1,18 +1,23 @@
 <?php
 use Bitrix\Main\ModuleManager;
 use \Bitrix\Main\Localization\Loc;
-use Itb\Entity\BonusEventTable;
+use Itb\Bonus\Entity\BonusEventTable;
+use Itb\Bonus\Entity\BonusAddTable;
+use Bitrix\Main\Application;
+use Itb\Bonus\Install\BonusInstallFirst;
+use Itb\Bonus\Install\UserProps;
+use Itb\Bonus\Install\OrderProps;
 IncludeModuleLangFile(__FILE__);
 
 Class Bonus_Itb extends CModule
 {
-    var $MODULE_ID = 'bonus_itb';
-    var $MODULE_VERSION;
-    var $MODULE_VERSION_DATE;
-    var $MODULE_NAME;
-    var $MODULE_DESCRIPTION;
+    public $MODULE_ID = 'bonus_itb';
+    public $MODULE_VERSION;
+    public $MODULE_VERSION_DATE;
+    public $MODULE_NAME;
+    public $MODULE_DESCRIPTION;
 
-    function __construct()
+    public function __construct()
     {
         $arModuleVersion = array();
         include(dirname(__FILE__)."/version.php");
@@ -22,36 +27,45 @@ Class Bonus_Itb extends CModule
         $this->MODULE_DESCRIPTION = GetMessage("BONUS_ITB_MODULE_DESC");
     }
 
-    function InstallDB()
+    public function InstallDB()
     {
-        global $DB;
-
-        $DB->RunSQLBatch(__DIR__ .'/db/mysql/install.sql');
-
+        $connection = Application::getConnection();
+        if (!$connection->isTableExists(BonusEventTable::getTableName()) && !$connection->isTableExists(BonusAddTable::getTableName())) {
+            BonusEventTable::getEntity()->createDbTable();
+            BonusAddTable::getEntity()->createDbTable();
+        }
     }
 
-    function UnInstallDB()
+    public function UnInstallDB()
     {
-        global $DB;
+        $connection = Application::getConnection();
 
-        $DB->RunSQLBatch(__DIR__ .'/db/mysql/uninstall.sql');
+        if ($connection->isTableExists(BonusEventTable::getTableName()) && $connection->isTableExists(BonusAddTable::getTableName())) {
+            $connection->dropTable(BonusEventTable::getTableName());
+            $connection->dropTable(BonusAddTable::getTableName());
+        }
     }
 
-    function DoInstall()
+    public function DoInstall()
     {
+        $this->runComposerInstall();
+
+        $autoloadPath = __DIR__ . '/../vendor/autoload.php';
+        if (file_exists($autoloadPath)) {
+            require_once $autoloadPath;
+        }
 
         $this->InstallDB();
 
         //Добавление дополнительного поля для пользователя
-        include(dirname(__FILE__)."/include/add_user_prop.php");
+        UserProps::AddProps();
 
         //Добавление групп и свойств в ОРДЕР
-        include(dirname(__FILE__)."/include/add_order_props.php");
+        OrderProps::AddOrderProps();
 
-        include(dirname(__FILE__)."/include/bonus_install.php");
-
+        BonusInstallFirst::BonusInstall();
         //Добавление платёжной системой
-        include(dirname(__FILE__)."/include/paysystem_install.php");
+        OrderProps::InstallPaySystem();
 
         include($_SERVER['DOCUMENT_ROOT'].'/local/modules/bonus_itb/options.php');
 
@@ -59,22 +73,32 @@ Class Bonus_Itb extends CModule
         CopyDirFiles(dirname(__FILE__)."/js", $_SERVER["DOCUMENT_ROOT"]."/bitrix/js/bonus_itb/", true, true);
 
         RegisterModuleDependences("sale","OnSaleOrderPaid","bonus_itb","SaleOrderPaid","SaleOrderPaidAddBonus");
-        RegisterModuleDependences("sale","OnSaleComponentOrderResultPrepared","bonus_itb","\Itb\Bonus\Event\OrderResultPrepared","OnSaleComponentOrderResultPrepared");
-        RegisterModuleDependences("sale","OnSaleOrderBeforeSaved","bonus_itb","\Itb\Bonus\Event\OnSaleOrderSaved","OnSaleOrderBeforeSaved");
-        RegisterModuleDependences("sale","OnSaleOrderSaved","bonus_itb","\Itb\Bonus\Event\OnSaleOrderSaved","OrderAfterSaved", 1);
+        RegisterModuleDependences(
+            "sale",
+            "OnSaleComponentOrderResultPrepared",
+            "bonus_itb",
+            "Itb\\Bonus\\Event\\OrderResultPrepared",
+            "OnSaleComponentOrderResultPrepared"
+        );
+        RegisterModuleDependences("sale","OnSaleOrderBeforeSaved","bonus_itb","Itb\Bonus\Event\OnSaleOrderSaved","OnSaleOrderBeforeSaved");
+        RegisterModuleDependences("sale","OnSaleOrderSaved","bonus_itb","Itb\Bonus\Event\OnSaleOrderSaved","OrderAfterSaved", 1);
         ModuleManager::RegisterModule($this->MODULE_ID);
 
         return true;
     }
 
-    function DoUninstall()
+    public function DoUninstall()
     {
+        $autoloadPath = __DIR__ . '/../vendor/autoload.php';
+        if (file_exists($autoloadPath)) {
+            require_once $autoloadPath;
+        }
 
         $this->UnInstallDB();
 
-        include(dirname(__FILE__)."/include/delete_user_props.php");
-        include(dirname(__FILE__)."/include/delete_order_props.php");
-        include(dirname(__FILE__)."/include/del_paysystem.php");
+        UserProps::DeleteProps();
+        OrderProps::DeleteOrderProps();
+        OrderProps::DeletePaySystem();
         DeleteDirFiles(dirname(__FILE__)."/admin", $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin");
 
         DeleteDirFilesEx("/bitrix/js/bonus_itb");
@@ -83,6 +107,22 @@ Class Bonus_Itb extends CModule
 
         ModuleManager::UnRegisterModule($this->MODULE_ID);
         return true;
+    }
+
+    private function runComposerInstall()
+    {
+        $moduleDir = realpath(__DIR__ . '/..');
+        $composer = $moduleDir . '/composer.phar';
+
+        $cmd = 'HOME=/tmp php ' . escapeshellarg($composer) . ' install --no-interaction --no-dev --working-dir=' . escapeshellarg($moduleDir) . ' 2>&1';
+        exec($cmd, $output, $resultCode);
+
+        if ($resultCode !== 0) {
+            echo '<div style="color:red">⚠️ Composer install завершился с ошибкой:</div>';
+            echo '<pre>' . htmlspecialchars(implode("\n", $output)) . '</pre>';
+        } else {
+            echo '<div style="color:green">✅ Composer зависимости успешно установлены.</div>';
+        }
     }
 
 }
