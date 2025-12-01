@@ -767,7 +767,7 @@ class SaleOrderAjax {
                     "ORDER_ID" => $order_id,
                     "BONUS_PRICE" => $arBonus['ALL_BONUS'],
                     "TYPE" => 'order',
-                    "BEFORE_PRICE_BONUS" => $UserBallance,
+                    "BEFORE_PRICE_BONUS" => !empty($UserBallance) ? $UserBallance : 0,
                 );
 
                 BonusAddTable::add($arFields);

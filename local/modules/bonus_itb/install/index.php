@@ -7,6 +7,11 @@ use Bitrix\Main\Application;
 use Itb\Bonus\Install\BonusInstallFirst;
 use Itb\Bonus\Install\UserProps;
 use Itb\Bonus\Install\OrderProps;
+use Itb\Bonus\Event\OrderResultPrepared;
+use Itb\Bonus\Event\OnSaleOrderSaved;
+
+
+
 IncludeModuleLangFile(__FILE__);
 
 Class Bonus_Itb extends CModule
@@ -72,7 +77,7 @@ Class Bonus_Itb extends CModule
         CopyDirFiles(dirname(__FILE__)."/admin", $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin", true, true);
         CopyDirFiles(dirname(__FILE__)."/js", $_SERVER["DOCUMENT_ROOT"]."/bitrix/js/bonus_itb/", true, true);
 
-        RegisterModuleDependences("sale","OnSaleOrderPaid","bonus_itb","SaleOrderPaid","SaleOrderPaidAddBonus");
+        RegisterModuleDependences("sale","OnSaleOrderPaid","bonus_itb","Itb\\Bonus\\Class\\SaleOrderPaid","SaleOrderPaidAddBonus");
         RegisterModuleDependences(
             "sale",
             "OnSaleComponentOrderResultPrepared",
@@ -80,8 +85,8 @@ Class Bonus_Itb extends CModule
             "Itb\\Bonus\\Event\\OrderResultPrepared",
             "OnSaleComponentOrderResultPrepared"
         );
-        RegisterModuleDependences("sale","OnSaleOrderBeforeSaved","bonus_itb","Itb\Bonus\Event\OnSaleOrderSaved","OnSaleOrderBeforeSaved");
-        RegisterModuleDependences("sale","OnSaleOrderSaved","bonus_itb","Itb\Bonus\Event\OnSaleOrderSaved","OrderAfterSaved", 1);
+        RegisterModuleDependences("sale","OnSaleOrderBeforeSaved","bonus_itb","Itb\\Bonus\\Event\\OnSaleOrderSaved","OnSaleOrderBeforeSaved");
+        RegisterModuleDependences("sale","OnSaleOrderSaved","bonus_itb","Itb\\Bonus\\Event\\OnSaleOrderSaved","OrderAfterSaved", 1);
         ModuleManager::RegisterModule($this->MODULE_ID);
 
         return true;

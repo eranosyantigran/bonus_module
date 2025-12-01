@@ -147,7 +147,9 @@ class ItbHelpers
             $user_id = $USER->GetID();
 
         $arParams["SELECT"] = array("UF_BONUS_COUNT");
-        $DBUserBonus = \CUser::GetList(($by="ID"),($order="desc"),array("ID" => $user_id),$arParams);
+        $by="ID";
+        $order="desc";
+        $DBUserBonus = \CUser::GetList($by,$order,array("ID" => $user_id),$arParams);
         if($arUserBonus = $DBUserBonus->Fetch())
         {
             $userBonus = $arUserBonus["UF_BONUS_COUNT"];

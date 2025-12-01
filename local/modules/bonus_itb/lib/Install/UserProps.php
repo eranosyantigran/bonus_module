@@ -27,11 +27,11 @@ class UserProps
                 'MANDATORY'         => 'N',
                 'SHOW_FILTER'       => 'I',
                 'SHOW_IN_LIST'      => '',
-                'EDIT_IN_LIST'      => '',
+                'EDIT_IN_LIST'      => 'N',
                 'IS_SEARCHABLE'     => 'N',
                 'SETTINGS'          => array(
-                    'DEFAULT_VALUE' => '0',
                     'SIZE'          => '20',
+                    'DEFAULT_VALUE' => '0',
                     'PRECISION'     => '2',
                     'MIN_VALUE'    => '0',
                     'MAX_VALUE'    => '0',
