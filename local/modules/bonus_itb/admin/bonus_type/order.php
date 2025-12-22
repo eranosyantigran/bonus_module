@@ -1,4 +1,5 @@
 <?php
+
 global $APPLICATION;
 
 if($request->getPost('id') == 'new'){
@@ -6,7 +7,7 @@ if($request->getPost('id') == 'new'){
 }else{
     $arProfileConditions = unserialize($rs["CONDITIONS"]);
     $otherConditions = unserialize($rs["CONDITIONS_PRICE"]);
-    $arProfileConditions = Itb\Bonus\Condition\ConditionBonus::SetLabelsOrder($arProfileConditions);
+    $arProfileConditions = \Itb\Bonus\Condition\ConditionBonus::SetLabelsOrder($arProfileConditions);
     $jsonProfileConditions = \Bitrix\Main\Web\Json::encode($arProfileConditions);
 }
 

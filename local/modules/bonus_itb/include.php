@@ -10,6 +10,8 @@ if (file_exists($autoloadPath)) {
 \Bitrix\Main\Loader::registerAutoLoadClasses('bonus_itb', array(
         'Itb\Bonus\Ajax\SaleOrderAjax' => "lib/Ajax/SaleOrderAjax.php",
         'Itb\Bonus\Helper\ItbHelpers' => "lib/Helper/ItbHelpers.php",
+        'Itb\Bonus\Conditions\OrderBonus' => "lib/Conditions/OrderBonus.php",
+        'Itb\Bonus\Condition\ConditionBonus' => "lib/Conditions/ConditionBonus.php",
         'Itb\Bonus\Class\CalculateBonus' => "lib/Class/CalculateBonus.php",
         'Itb\Bonus\Class\SaleOrderPaid' => "lib/Class/SaleOrderPaid.php",
         'Itb\Bonus\Entity\BonusEventTable' => "lib/Entity/BonusEventTable.php",
