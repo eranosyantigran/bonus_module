@@ -1295,7 +1295,7 @@ class CalculateBonus
                     elseif($done == 'A')
                         $arDone["CONDITIONS_ALIEN"][] = $arCondition;
 
-                endforeach; //conditions
+                endforeach; //Conditions
 
 
                 if($globalLogic == 'AND' && empty($arDone["CONDITIONS_NO_DONE"]))

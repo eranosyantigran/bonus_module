@@ -23,8 +23,8 @@ if ((!empty($request['apply']) || !empty($request->getPost('save'))) && !empty($
     );
 
     $saveConditions = [];
-    if (!empty($request->getPost("profileProductsCond")))
-        $saveConditions = \Itb\Bonus\Conditions\OrderBonus::SaveConditions($request["profileProductsCond"]);
+    if (!empty($request->getPost("profileCond")))
+        $saveConditions = \Itb\Bonus\Conditions\OrderBonus::SaveConditions($request["profileCond"]);
 
     $arSaveFields['CONDITIONS'] = serialize($saveConditions);
     $arSaveFields['CONDITIONS_PRICE'] = serialize($priceConditions);

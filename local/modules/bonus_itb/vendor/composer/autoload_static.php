@@ -23,7 +23,7 @@ class ComposerStaticInit88a19972c93cbf4906fc87c41da1e9c8
     public static $classMap = array (
         'Itb\\Bonus\\CalculateBonus' => __DIR__ . '/../..' . '/lib/calculate.php',
         'Itb\\Bonus\\Condition\\ConditionBonus' => __DIR__ . '/../..' . '/lib/conditions/order_conditions_save.php',
-        'Itb\\Bonus\\Conditions\\OrderBonus' => __DIR__ . '/../..' . '/lib/conditions/order_bonus.php',
+        'Itb\\Bonus\\Conditions\\OrderBonus' => __DIR__ . '/../..' . '/lib/conditions/OrderBonus.php',
         'Itb\\Bonus\\Entity\\BonusAddTable' => __DIR__ . '/../..' . '/lib/Entity/BonusAddTable.php',
         'Itb\\Bonus\\Entity\\BonusEventTable' => __DIR__ . '/../..' . '/lib/Entity/BonusEventTable.php',
         'Itb\\Bonus\\Event\\BonusOrder' => __DIR__ . '/../..' . '/lib/Event/BonusOrder.php',

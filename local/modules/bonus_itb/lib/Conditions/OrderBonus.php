@@ -8,11 +8,11 @@ class OrderBonus
     public static function ArrayParams($mode=''){
 
         $arParams = array(
-            "parentContainer" => 'OrderConditions',
+            "parentContainer" => 'ProfileConditions',
             "form" => '',
             "formName" => 'itb_bonus',
             "sepID" => '__',
-            "prefix" => "profileProductsCond",
+            "prefix" => "profileCond",
             "messTree" => array(
                 "SELECT_CONTROL" => GetMessage("ITB_SELECT_COND"),
                 "ADD_CONTROL" => GetMessage("ITB_ADD_PROFILE_COND"),
@@ -30,22 +30,22 @@ class OrderBonus
     public static function OrderBaseConditions($mode='')
     {
         $params = array(
-            "id" => '0',
-            "controlId" => 'CondGroup',
-            "children" => array(
+            'id' => '0',
+            'controlId' => 'CondGroup',
+            'children' => array(
                 array(
-                    'id' => 0,
-                    'controlId' => "conditionGroup",
+                    'id' => '0',
+                    'controlId' => 'conditionGroup',
                     'values' => array(
-                        "bonus" => 0,
-                        "bonus_type" => "percent",
-                        "round" => "C",
-                        "All" => "OR",
-                        "True" => "True",
+                        'bonus' => '0',
+                        'bonus_type' => 'percent',
+                        "All" => 'OR',
+                        "True" => 'True'
                     ),
-                    'children' => [],
-                ),
-            ),
+                    "children" => array()
+                )
+
+            )
         );
 
        if($mode=='json'){

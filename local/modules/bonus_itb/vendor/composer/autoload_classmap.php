@@ -7,8 +7,8 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Itb\\Bonus\\CalculateBonus' => $baseDir . '/lib/calculate.php',
-    'Itb\\Bonus\\Condition\\ConditionBonus' => $baseDir . '/lib/conditions/order_conditions_save.php',
-    'Itb\\Bonus\\Conditions\\OrderBonus' => $baseDir . '/lib/conditions/order_bonus.php',
+    'Itb\\Bonus\\Condition\\ConditionBonus' => $baseDir . '/lib/Conditions/order_conditions_save.php',
+    'Itb\\Bonus\\Conditions\\OrderBonus' => $baseDir . '/lib/Conditions/OrderBonus.php',
     'Itb\\Bonus\\Entity\\BonusAddTable' => $baseDir . '/lib/Entity/BonusAddTable.php',
     'Itb\\Bonus\\Entity\\BonusEventTable' => $baseDir . '/lib/Entity/BonusEventTable.php',
     'Itb\\Bonus\\Event\\BonusOrder' => $baseDir . '/lib/Event/BonusOrder.php',

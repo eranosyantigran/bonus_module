@@ -1,6 +1,8 @@
 <?php
 
 global $APPLICATION;
+CJSCore::Init(['core', 'ui', 'core_condtree']);
+\Bitrix\Main\UI\Extension::load('sale.discount.Conditions');
 
 if($request->getPost('id') == 'new'){
     $jsonProfileConditions = Itb\Bonus\Conditions\OrderBonus::OrderBaseConditions('json');
@@ -26,7 +28,6 @@ $tabControl = new CAdminTabControl("tabControl".$bonus_id, $aTabs);
 
 require_once(dirname(__FILE__).'/save_bonus.php');
 
-CJSCore::Init(['core', 'ui', 'core_condtree']);
 ?>
 
 <section class="">
@@ -164,10 +165,13 @@ CJSCore::Init(['core', 'ui', 'core_condtree']);
 
         <tr class="heading" id="tr_BT_SALE_DISCOUNT_SECT_APP"><td colspan="2"><?=GetMessage("ITB_PRODUCTS_COND_SECT")?></td></tr>
         <tr><td width="100%" colspan="2">
-                <div id="OrderConditions"></div>
+                <div id="ProfileConditions"></div>
 
                 <script>
-                    var JSSaleAct=new BX.TreeConditions(<?=\Itb\Bonus\Conditions\OrderBonus::ArrayParams('json');?>, <?=$jsonProfileConditions?>, <?=\Itb\Bonus\Conditions\OrderBonus::BonusOrderControls('json') ?>);
+                    var JSSaleAct=new BX.TreeConditions(
+                            <?=\Itb\Bonus\Conditions\OrderBonus::ArrayParams('json');?>,
+                            <?=$jsonProfileConditions?>,
+                            <?=\Itb\Bonus\Conditions\OrderBonus::BonusOrderControls('json') ?>);
                 </script>
             </td></tr>
 
