@@ -14,7 +14,7 @@ $MESS["ITB_SELECT_BONUS_CURRENCY"] = "Валюта счета<br />(при ис�
 
 $MESS["ITB_SITE_SELECT"] = "Сайты, на которых доступна бонусная система<br />(все, если не выделено)";
 
-$MESS["ITB_EVENT_USER_REGISTER"] = "Регистрация пользователей <a href='https://logictim.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/api_modulya_4/user_register/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
+$MESS["ITB_EVENT_USER_REGISTER"] = "Регистрация пользователей <a href='https://ITB.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/api_modulya_4/user_register/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_EVENT_USER_REGISTER_TITLE"] = "Событием регистрации считается";
 $MESS["ITB_EVENT_USER_REGISTER_ADD"] = "Любое добавление пользователя";
 $MESS["ITB_EVENT_USER_REGISTER_REGISTER"] = "Регистрация пользователя через форму регистрации";
@@ -22,7 +22,7 @@ $MESS["ITB_EVENT_USER_REGISTER_REGISTER"] = "Регистрация пользо
 $MESS["ITB_TAB_2"] = "Настройки начисления бонусов";
 $MESS["ITB_MEDOD_3_4_PROPERTY"] = "Настройки начисления бонусов за заказ <a href='https://youtu.be/oCVbKV8i_s0?t=491' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_MEDOD_5_PROPERTY"] = "Настройки начисления бонусов за товары <a href='https://youtu.be/oCVbKV8i_s0?t=491' target='_blank' class='lgb_instruction'>(инструкция)</a>";
-$MESS["ITB_ORDERS_SUM_VARIANTS"] = "Настройки зависимости бонусов от суммы оплаченных заказов <a href='https://logictim.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/zavisimost_bonusov_ot_summy_oplachennykh_zakazov/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
+$MESS["ITB_ORDERS_SUM_VARIANTS"] = "Настройки зависимости бонусов от суммы оплаченных заказов <a href='https://ITB.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/zavisimost_bonusov_ot_summy_oplachennykh_zakazov/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_ORDERS_SUM_RANGE_TYPE"] = "Вариант использования";
 $MESS["ITB_ORDERS_SUM_RANGE_TYPE_NO_USE"] = "Не использовать";
 $MESS["ITB_ORDERS_SUM_RANGE_TYPE_PLUS"] = "Добавлять к основному проценту";
@@ -53,7 +53,7 @@ $MESS["ITB_CART_SUM_RANGE_PLACE_1"] = "Например: 0-5000";
 $MESS["ITB_CART_SUM_RANGE_PLACE_2"] = "Например: 5001-10000";
 $MESS["ITB_CART_SUM_RANGE_PLACE_3"] = "Например: 10001-0";
 
-$MESS["ITB_BONUS_REFERAL_SYSTEM"] = "Реферальная программа <a href='https://logictim.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/nastroyka_referalnoy_programmy/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
+$MESS["ITB_BONUS_REFERAL_SYSTEM"] = "Реферальная программа <a href='https://ITB.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/nastroyka_referalnoy_programmy/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_REFERAL_SYSTEM_TYPE"] = "Вариант начисления";
 $MESS["ITB_REFERAL_SYSTEM_TYPE_NO_USE"] = "Не использовать";
 $MESS["ITB_REFERAL_SYSTEM_TYPE_FIX_ORDER"] = "% от суммы заказа, включая доставку";
@@ -63,13 +63,13 @@ $MESS["ITB_REFERAL_SYSTEM_BONUS"] = "Процент";
 $MESS["ITB_REFERAL_USE_COUPONS"] = "Использовать купоны для привлечения рефералов";
 $MESS["ITB_REFERAL_USE_COUPONS_Y"] = "Да";
 $MESS["ITB_REFERAL_USE_COUPONS_N"] = "Нет";
-$MESS["logictim.referals_REFERAL_COUPON_DISCOUNT"] = "Скидка по купонам";
-$MESS["logictim.referals_REFERAL_COUPON_DISCOUNT_NO"] = "Не установлено";
+$MESS["ITB_REFERAL_COUPON_DISCOUNT"] = "Скидка по купонам";
+$MESS["ITB_REFERAL_COUPON_DISCOUNT_NO"] = "Не установлено";
 $MESS["ITB_REFERAL_COUPON_PREFIX"] = "Правило генерации купонов";
 $MESS["ITB_REFERAL_COUPON_DISCOUNT_IN_PROFILE"] = "Включить выбор скидки в настройках реф правил";
 $MESS["ITB_REFERAL_COUPON_DISCOUNT_IN_PROFILE_NOTES"] = "В каждом реферальном правиле можно будет указать разную скидку (правило корзины) для привязки реферального купона";
 $MESS["ITB_REFERAL_COUPON_CAN_USER"] = "Позволять партнерам самим указывать код купона<br /><div class='comment'>(пользователи сами смогут в личном кабинете создать купон со своим кодом)</div>";
-$MESS["ITB_REFERAL_COUPON_PREFIX_NOTES"] = "Доступные переменные:<br />#USER_ID# - ID пользователя, <br />#AUTO# - автоматическая генерация кода<br /><br />Если пусто, или не указано ни одной переменной, то купон генерируется в виде: PARTNER_1, где 1 - ID пользователя<br /><br />Вы можете использовать собственную логику формирования купона, используя АПИ модуля. <a href='https://logictim.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/api_modulya_4/sobytie_pri_generatsii_referalnogo_kupona_dlya_partnerov/' target='_blank' class='lgb_instruction'>Инструкция</a>";
+$MESS["ITB_REFERAL_COUPON_PREFIX_NOTES"] = "Доступные переменные:<br />#USER_ID# - ID пользователя, <br />#AUTO# - автоматическая генерация кода<br /><br />Если пусто, или не указано ни одной переменной, то купон генерируется в виде: PARTNER_1, где 1 - ID пользователя<br /><br />Вы можете использовать собственную логику формирования купона, используя АПИ модуля. <a href='https://ITB.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/api_modulya_4/sobytie_pri_generatsii_referalnogo_kupona_dlya_partnerov/' target='_blank' class='lgb_instruction'>Инструкция</a>";
 $MESS["ITB_REFERAL_LEVELS"] = "Количество уровней реферальной системы";
 
 
@@ -81,7 +81,7 @@ $MESS["ITB_BONUS_MINUS_DISCOUNT_PROD"] = "Не начислять бонусы �
 $MESS["ITB_BONUS_MINUS_BONUS"] = "Не начислять бонусы на сумму, оплаченную баллами";
 $MESS["ITB_BONUS_FOR_DELIVERY"] = "<b>Учитывать стоимость доставки</b>";
 
-$MESS["ITB_OPTIONS_EVENTS_ORDER"] = "Когда начислять бонусы за заказ <a href='https://logictim.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/instruktsii_po_nastroyke_4/nastroyki_modulya/kogda_nachislyat_bonusy_za_zakaz/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
+$MESS["ITB_OPTIONS_EVENTS_ORDER"] = "Когда начислять бонусы за заказ <a href='https://ITB.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/instruktsii_po_nastroyke_4/nastroyki_modulya/kogda_nachislyat_bonusy_za_zakaz/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_EVENT_ORDER_END"] = "Перевод заказа в статус Выполнен (код F)";
 $MESS["ITB_EVENT_ORDER_PAYED"] = "При полной оплате заказа";
 
@@ -95,7 +95,7 @@ $MESS["ITB_SELECT_MIN_BONUS_TYPE_2"] = "Ограничение по минима
 $MESS["ITB_SELECT_MIN_BONUS_TYPE_3"] = "Ограничение в % от суммы заказа, исключая доставку";
 $MESS["ITB_SELECT_MIN_BONUS_TYPE_4"] = "Ограничение в % от суммы заказа, включая доставку";
 
-$MESS["ITB_BONUS_REPOST_GROUP"] = "Бонусы за репосты <a href='https://logictim.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/bonusy_za_reposty/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
+$MESS["ITB_BONUS_REPOST_GROUP"] = "Бонусы за репосты <a href='https://ITB.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/bonusy_za_reposty/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_BONUS_REPOST_VK"] = "<b>Бонусы за репост Вконтакте</b>";
 $MESS["ITB_BONUS_REPOST_FB"] = "<b>Бонусы за репост Facebook</b>";
 $MESS["ITB_BONUS_REPOST_TW"] = "<b>Бонусы за репост Twitter</b><br />(не работает по причине ошибки в АПИ социальной сети)";
@@ -109,7 +109,7 @@ $MESS["ITB_BONUS_ALL_REPOST_SAVE"] = "<b>Сохранять все репост�
 $MESS["ITB_BONUS_REPOST_ALL_COUNT"] = "<b>Максимальное количество платных репостов<br />(для одного пользователя)</b>";
 $MESS["ITB_BONUS_REPOST_PAGE_COUNT"] = "<b>Максимальное количество платных репостов каждой страницы</b><br />(для одного пользователя)";
 
-$MESS["ITB_BONUS_REFERAL_GROUP"] = "Бонусы за переход по репостам <a href='https://logictim.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/bonusy_za_perekhody_po_repostam/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
+$MESS["ITB_BONUS_REFERAL_GROUP"] = "Бонусы за переход по репостам <a href='https://ITB.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/bonusy_za_perekhody_po_repostam/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_BONUS_REFERAL"] = "<b>Бонусы за переход по репосту</b>";
 $MESS["ITB_BONUS_REFERAL_NAME_VK"] = "Вконтакте";
 $MESS["ITB_BONUS_REFERAL_NAME_FB"] = "Facebook";
@@ -136,7 +136,7 @@ $MESS["ITB_BONUS_REVIEW_COUNT"] = "<b>Отзывов<b>";
 
 
 $MESS["ITB_OPTIONS"] = "Настройки";
-$MESS["ITB_OPTIONS_MAIN"] = "Основные настройки <a href='https://logictim.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/instruktsii_po_nastroyke_4/nastroyki_modulya/nastroyki_ispolzuemyy_schet_i_sposob_oplaty_bonusami/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
+$MESS["ITB_OPTIONS_MAIN"] = "Основные настройки <a href='https://ITB.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/instruktsii_po_nastroyke_4/nastroyki_modulya/nastroyki_ispolzuemyy_schet_i_sposob_oplaty_bonusami/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_OPTIONS_MIN_PAYMENT_BONUS"] = "Настройки минимальной суммы оплаты бонусами";
 $MESS["ITB_OPTIONS_MAX_PAYMENT_BONUS"] = "Настройки максимальной суммы оплаты бонусами";
 $MESS["ITB_OPTIONS_TEXT"] = "Текстовые настройки";
@@ -157,7 +157,7 @@ $MESS["ITB_USER_GROUPS_TYPE_2"] = "Запретить использование
 
 $MESS["ITB_USER_GROUPS"] = "Группы пользователей";
 
-$MESS["ITB_BONUS_TIME_GROUP"] = "<b>Настройки срока жизни бонусов <a href='https://logictim.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/nastroyki_sroka_zhizni_bonusov/' target='_blank' class='lgb_instruction'>(инструкция)</a></b>";
+$MESS["ITB_BONUS_TIME_GROUP"] = "<b>Настройки срока жизни бонусов <a href='https://ITB.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/nastroyki_sroka_zhizni_bonusov/' target='_blank' class='lgb_instruction'>(инструкция)</a></b>";
 $MESS["ITB_LIVE_BONUS"] = "<b>Включить время жизни бонусов</b>";
 $MESS["ITB_LIVE_BONUS_TIME"] = "<b>Время жизни бонусов (дней)</b>";
 $MESS["ITB_LIVE_BONUS_ALL"] = "<b>Дата окончания всех бонусов</b><br />(устанавливает дату сгорания уже начисленных бонусов, если ранее время жизни бонусов не использовалось)";
@@ -218,19 +218,19 @@ $MESS["ITB_FREE_BONUS_GO"] = "Начислить";
 $MESS["ITB_EVENTS_MAIL_GROUP"] = "Почтовые события по стандарту 1С-Битрикс:";
 $MESS["ITB_EVENTS_MAIL_DESCRIPTION_LABEL"] = "Описание:";
 $MESS["ITB_EVENTS_MAIL_DESCRIPTION"] = "<b>Доступны следующие почтовые события:</b><br />
-	1. Начисление бонусов за заказ <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_FROM_ORDER_ADD'>Открыть</a><br />
-	2. Начисление бонусов при регистрации <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_FROM_REGISTER_ADD'>Открыть</a><br />
-	3. Начисление бонусов на день рождения <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_FROM_BIRTHDAY_ADD'>Открыть</a><br />
-	4. Предупреждение о сгорании бонусов <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_WARNING_END_TIME'>Открыть</a><br />
-	5. Начисление бонусов за репост <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_FROM_REPOST'>Открыть</a><br />
-	6. Начисление бонусов за переход по ссылке <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_FROM_LINK'>Открыть</a><br />
-	7. Начисление бонусов за отзывы и комментарии <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_FROM_REVIEW'>Открыть</a><br />
-	8. Начисление бонусов за подписку <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_FROM_SUBSCRIBE'>Открыть</a><br />
-	9. Начисление бонусов за заказ реферала <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_FROM_REFERAL_ADD'>Открыть</a><br />
-	10. Новая заявка на вывод бонусов <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_EXIT_BONUS_INSERT'>Открыть</a><br />
-	11. Заявка на вывод бонусов отклонена <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_EXIT_BONUS_CANCEL'>Открыть</a><br />
-	12. Закрыта заявка на вывод бонусов <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_EXIT_BONUS_CLOSE'>Открыть</a><br />
-	13. Ручное начисление бонусов <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=LOGICTIM_BONUS_FROM_FREE_ADD'>Открыть</a>
+	1. Начисление бонусов за заказ <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_FROM_ORDER_ADD'>Открыть</a><br />
+	2. Начисление бонусов при регистрации <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_FROM_REGISTER_ADD'>Открыть</a><br />
+	3. Начисление бонусов на день рождения <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_FROM_BIRTHDAY_ADD'>Открыть</a><br />
+	4. Предупреждение о сгорании бонусов <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_WARNING_END_TIME'>Открыть</a><br />
+	5. Начисление бонусов за репост <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_FROM_REPOST'>Открыть</a><br />
+	6. Начисление бонусов за переход по ссылке <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_FROM_LINK'>Открыть</a><br />
+	7. Начисление бонусов за отзывы и комментарии <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_FROM_REVIEW'>Открыть</a><br />
+	8. Начисление бонусов за подписку <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_FROM_SUBSCRIBE'>Открыть</a><br />
+	9. Начисление бонусов за заказ реферала <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_FROM_REFERAL_ADD'>Открыть</a><br />
+	10. Новая заявка на вывод бонусов <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_EXIT_BONUS_INSERT'>Открыть</a><br />
+	11. Заявка на вывод бонусов отклонена <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_EXIT_BONUS_CANCEL'>Открыть</a><br />
+	12. Закрыта заявка на вывод бонусов <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_EXIT_BONUS_CLOSE'>Открыть</a><br />
+	13. Ручное начисление бонусов <a target='_blank' href='/bitrix/admin/type_edit.php?EVENT_NAME=ITB_BONUS_FROM_FREE_ADD'>Открыть</a>
 	";
 $MESS["ITB_COUNT_DAY_WARNING"] = "<b>За сколько дней предупреждать пользователей о сгорании бонусов</b><br />Через запятую. Например: <1, 3, 5> (0 - не предупреждать)";
 $MESS["ITB_AGENTS_WORK_TIME"] = "<b>Время отправки уведомлений</b><br />";
@@ -286,17 +286,17 @@ $MESS["ITB_SEND_MAIL_TEXTAREA_BIRTHDAY_DEFAULT"] = 'Здравствуйте, <b
 
 
 $MESS["ITB_TAB_5"] = "Настройка интеграции в шаблоны";
-$MESS["ITB_OPTIONS_ORDER_FORM"] = "Настройки страницы оформления заказа <a href='https://logictim.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/avtomaticheskaya_integratsiya_v_koriznu_i_oformlenie_zakaza/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
+$MESS["ITB_OPTIONS_ORDER_FORM"] = "Настройки страницы оформления заказа <a href='https://ITB.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/avtomaticheskaya_integratsiya_v_koriznu_i_oformlenie_zakaza/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_INTEGRATE_IN_SALE_ORDER_AJAX"] = "<b>Интегрировать бонусы в шаблон компонента оформления заказа sale.order.ajax</b><br />(При использовании стандартного шаблона битрикс)";
 $MESS["ITB_INTEGRATE_IN_SALE_ORDER_AJAX_NOTE"] = "После изменения параметра требуется очистка кэша сайта <a href='/bitrix/admin/cache.php' target='_blank'>Перейти</a>";
 $MESS["ITB_ORDER_TOTAL_BONUS"] = "<b>Показывать сумму заказа с учетом бонусов</b><br />(Показывать 'Итого' с учетом оплаты бонусами)";
 $MESS["ITB_ORDER_PAY_BONUS_AUTO"] = "<b>Автоматическое применение доступных бонусов</b><br />(В поле <Оплатить бонусами:> подставляется и сразу применяется доступная сумма)";
 
-$MESS["ITB_INTEGRATE_IN_SALE_BASKET"] = "Настройки страницы корзины <a href='https://logictim.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/avtomaticheskaya_integratsiya_v_koriznu_i_oformlenie_zakaza/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
+$MESS["ITB_INTEGRATE_IN_SALE_BASKET"] = "Настройки страницы корзины <a href='https://ITB.ru/marketplace/nakopitelnaya_sistema_bonusov_ballov/instruktsii_po_nastroyke/avtomaticheskaya_integratsiya_v_koriznu_i_oformlenie_zakaza/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_INTEGRATE_IN_SALE_BASKET_Y"] = "<b>Интегрировать бонусы в шаблон компонента корзины sale.basket.basket</b><br />(При использовании стандартного шаблона битрикс версии выше 17.8)";
 
 $MESS["ITB_INTEGRATE_IN_CATALOG"] = "Настройки интеграции в каталог";
-$MESS["ITB_INTEGRATE_AJAX_IN_CATALOG"] = '<b>AJAX вывод бонусов в каталоге</b><br />(При включенной опции нагрузка на сервер сильно возрастает)<br /> <a href="https://logictim.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/vnedrenie_v_shablony_4/ajax_vyvod_bonusov_v_kataloge/" target="_blank" class="lgb_instruction">(инструкция)</a>';
+$MESS["ITB_INTEGRATE_AJAX_IN_CATALOG"] = '<b>AJAX вывод бонусов в каталоге</b><br />(При включенной опции нагрузка на сервер сильно возрастает)<br /> <a href="https://ITB.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/vnedrenie_v_shablony_4/ajax_vyvod_bonusov_v_kataloge/" target="_blank" class="lgb_instruction">(инструкция)</a>';
 
 //VERSION 4
 $MESS["ITB_TAB_ACCESS"] = "Доступ";
@@ -304,12 +304,12 @@ $MESS["ITB_MODULE_VERSION"] = "Версия модуля";
 $MESS["ITB_MODULE_VERSION_3"] = "Без правил (старая)";
 $MESS["ITB_MODULE_VERSION_4"] = "С правилами (новая)";
 $MESS["ITB_VERSION_CHANGE_NOTES"] = "<b>ВАЖНО!!! Ознакомьтесь с инструкцией перед сменой версий!</b><br />
-Настройки в различных версиях отличаются!<br /><a href='https://logictim.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/instruktsii_po_nastroyke_4/nastroyki_modulya/perekhod_s_versii_3/' target='_blank' class='lgb_instruction'>Смотреть инструкцию</a>";
+Настройки в различных версиях отличаются!<br /><a href='https://ITB.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/instruktsii_po_nastroyke_4/nastroyki_modulya/perekhod_s_versii_3/' target='_blank' class='lgb_instruction'>Смотреть инструкцию</a>";
 $MESS["ITB_EVENT_ORDER_STATUS"] = "При переводе заказа в статус";
 $MESS["ITB_EVENT_ORDER_STATUS_NO"] = "Не учитывать";
 $MESS["ITB_MAIN_OPTIONS_TAB"] = "Основные настройки";
 $MESS["ITB_REFERAL_OPTIONS_TAB"] = "Реферальные настройки";
-$MESS["ITB_REFERAL_OPTIONS_SECTION"] = "Настройки реферальной программы <a href='https://logictim.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/instruktsii_po_nastroyke_4/nastroyki_modulya/nastroyki_referalnoy_sistemy/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
+$MESS["ITB_REFERAL_OPTIONS_SECTION"] = "Настройки реферальной программы <a href='https://ITB.ru/marketplace/nakopitelnaya_referalnaya_sistema_versii_4_0_i_vyshe/instruktsii_po_nastroyke_4/nastroyki_modulya/nastroyki_referalnoy_sistemy/' target='_blank' class='lgb_instruction'>(инструкция)</a>";
 $MESS["ITB_REFERAL_OPTIONS_PARTNER_GROUP"] = "При генерации купона добавлять пользователя в группу:<br /><div class='comment'>(чтобы в настройках скидки запретить ее применение владельцу купона)</div>";
 
 $MESS["ITB_TAB_6"] = 'Внешний обмен';

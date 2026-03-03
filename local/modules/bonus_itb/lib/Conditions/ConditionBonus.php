@@ -16,7 +16,9 @@ class ConditionBonus
         endforeach;
         if(!empty($usersId))
         {
-            $DBUser = \CUser::GetList(($by="ID"),($order="desc"),array("ID" => implode('|', $usersId)), array());
+            $by="ID";
+            $order="desc";
+            $DBUser = \CUser::GetList($by,$order,array("ID" => implode('|', $usersId)), array());
             while($arUser = $DBUser->Fetch())
             {
                 $userName = trim(($arUser["LAST_NAME"] != '' ? $arUser["LAST_NAME"] : '').($arUser["NAME"] != '' ? ' '.$arUser["NAME"] : ''));

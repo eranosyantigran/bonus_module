@@ -5,7 +5,7 @@ $showRightsTab = true;
 $arDiscounts = array();
 $discountIterator = \Bitrix\Sale\Internals\DiscountTable::getList(array('filter' => array()));
 $arDiscounts["REFERENCE_ID"][] = 0;
-$arDiscounts["REFERENCE"][] = GetMessage("logictim.referals_REFERAL_COUPON_DISCOUNT_NO");
+$arDiscounts["REFERENCE"][] = GetMessage("ITB_REFERAL_COUPON_DISCOUNT_NO");
 while($discount = $discountIterator->fetch())
 {
 	$arDiscounts["REFERENCE_ID"][] = $discount["ID"];
@@ -200,7 +200,7 @@ $arOptions = array(
    ),
    'REFERAL_COUPON_DISCOUNT' => array(
       'GROUP' => 'REFERAL_SYSTEM',
-      'TITLE' => GetMessage("logictim.referals_REFERAL_COUPON_DISCOUNT"),
+      'TITLE' => GetMessage("ITB_REFERAL_COUPON_DISCOUNT"),
       'TYPE' => 'SELECT',
       'VALUES' => $arDiscounts,
 	  'DEFAULT' => '0',
